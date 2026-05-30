@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const logger = require('../utils/logger');
+const AppError = require('../utils/AppError');
 
 const protect = (req, res, next) => {
   let token;
@@ -10,7 +11,7 @@ const protect = (req, res, next) => {
 
   if (!token) {
     logger.warn(`Unauthorized access attempt to ${req.originalUrl} - No token`);
-    return res.status(401).json({ success: false, message: 'Not authorized, no token' });
+    return next(new AppError('Not authorized, no token', 401));
   }
 
   try {
@@ -19,7 +20,8 @@ const protect = (req, res, next) => {
     next();
   } catch (err) {
     logger.warn(`Token verification failed - ${err.message}`);
-    return res.status(401).json({ success: false, message: 'Not authorized, token failed' });
+    // Forward the jwt error to the global error handler (which maps it to 401)
+    next(err);
   }
 };
 
