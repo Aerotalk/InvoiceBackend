@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 10px; color: #333; margin: 0; padding: 0; }
+        .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
+        .logo { max-width: 200px; }
+        .company-details { text-align: right; font-size: 10px; line-height: 1.4; }
+        .company-name { font-size: 14px; font-weight: bold; margin-bottom: 5px; }
+        .title { text-align: center; font-size: 16px; font-weight: bold; color: #888; margin: 20px 0; border-bottom: 2px solid #ddd; padding-bottom: 5px; }
+        
+        .four-col-header { display: flex; justify-content: space-between; margin-bottom: 20px; line-height: 1.5; font-size: 9px; }
+        .four-col-header > div { width: 23%; }
+        .four-col-header h4 { font-size: 11px; margin: 0 0 5px 0; color: #000; font-weight: bold; }
+        .bold { font-weight: bold; }
+        
+        .table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        .table th { background-color: #999; color: #fff; padding: 8px; text-align: left; font-size: 10px; }
+        .table td { padding: 8px; border-bottom: 1px solid #ddd; font-size: 10px; }
+        .text-right { text-align: right !important; }
+        .text-center { text-align: center !important; }
+        
+        .terms-section { background-color: #999; color: #fff; padding: 5px; font-weight: bold; margin-bottom: 10px; }
+        .terms-content { margin-bottom: 20px; line-height: 1.5; }
+        
+        .signatures { display: flex; justify-content: space-between; border: 1px solid #ddd; }
+        .sig-box { width: 33.33%; padding: 10px; border-right: 1px solid #ddd; }
+        .sig-box:last-child { border-right: none; }
+        .sig-header { background-color: #999; color: #fff; padding: 5px; font-weight: bold; margin: -10px -10px 10px -10px; text-align: center; }
+        .sig-field { margin-bottom: 10px; }
+        .sig-field label { display: inline-block; width: 60px; font-weight: bold; }
+        .company-seal { text-align: center; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">
+            <h1 style="color: #E24A26; margin: 0;">Grivety <span style="color: #00A3E0;">Global</span></h1>
+            <span style="font-size: 8px; color: #00A3E0;">We are ready to help you...</span>
+        </div>
+        <div class="company-details">
+            <div class="company-name">GRIVETY GLOBAL PRIVATE LIMITED</div>
+            <div>Disha Apartment, Flat No. 2, Ground Floor, DA-4/13,</div>
+            <div>Deshbandhu Nagar, Joramondir, Baguiati, VIP Road, Kolkata-700059</div>
+            <div>Phone no.: 033 40037666 Email: info@grivetyglobal.com</div>
+            <div>GSTIN: 19AAHCG8472G1Z6, State: 19-West Bengal</div>
+            <div>PAN: AAHCG8472G</div>
+        </div>
+    </div>
+
+    <div class="title">Delivery Challan</div>
+
+    <div class="four-col-header">
+        <div>
+            <h4>Delivery Challan For</h4>
+            <div class="bold" style="margin-bottom: 5px;">{{customer.displayName}}</div>
+            <div>{{customer.billingStreet1}}</div>
+            {{#if customer.billingStreet2}}<div>{{customer.billingStreet2}}</div>{{/if}}
+            <div>{{customer.billingCity}}{{#if customer.billingZipCode}}-{{customer.billingZipCode}}{{/if}}</div>
+            <div style="margin-top: 5px;">GSTIN : {{customer.taxId}}</div>
+            <div>State: {{customer.billingState}}</div>
+        </div>
+        
+        <div>
+            <h4>Ship To</h4>
+            <div class="bold" style="margin-bottom: 5px;">{{customer.displayName}}</div>
+            <div>{{customer.shippingStreet1}}</div>
+            {{#if customer.shippingStreet2}}<div>{{customer.shippingStreet2}}</div>{{/if}}
+            <div>{{customer.shippingCity}}{{#if customer.shippingZipCode}}-{{customer.shippingZipCode}}{{/if}}</div>
+        </div>
+
+        <div>
+            <h4>Transportation Details</h4>
+            <div style="margin-bottom: 5px;">Transport Mode: <br>{{transportMode}}</div>
+            <div style="margin-bottom: 5px;">Delivery Location: <br>{{deliveryLocation}}</div>
+            <div>EU PO/WO Number: <br>{{euPoWoNumber}}</div>
+        </div>
+
+        <div class="text-right">
+            <h4>Challan Details</h4>
+            <div>Challan No. : <br>{{challanNumber}}</div>
+            <div style="margin-top: 5px;">Date : {{challanDate}}</div>
+            <div style="margin-top: 5px;">Place of supply: {{customer.placeOfSupply}}</div>
+            <div style="margin-top: 5px;">Name: {{customer.displayName}}</div>
+            <div>Email: {{customer.email}}</div>
+            <div>Mobile: {{customer.workPhone}}</div>
+        </div>
+    </div>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th style="width: 5%;">#</th>
+                <th style="width: 55%;">Item name</th>
+                <th class="text-center" style="width: 15%;">HSN/ SAC</th>
+                <th class="text-center" style="width: 15%;">Quantity</th>
+                <th class="text-center" style="width: 10%;">Unit</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each items}}
+            <tr>
+                <td>{{this.index}}</td>
+                <td>
+                    <div class="bold">{{this.name}}</div>
+                    {{#if this.description}}<div style="font-size: 8px; color: #555; margin-top: 2px;">{{this.description}}</div>{{/if}}
+                </td>
+                <td class="text-center">{{this.hsn}}</td>
+                <td class="text-center">{{this.quantity}}</td>
+                <td class="text-center">{{this.unit}}</td>
+            </tr>
+            {{/each}}
+            <tr>
+                <td colspan="3" class="bold">Total</td>
+                <td class="text-center bold">{{totalQuantity}}</td>
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="terms-section">Terms and Conditions</div>
+    <div class="terms-content">
+        {{#if termsConditions}}
+            <div style="white-space: pre-wrap;">{{termsConditions}}</div>
+        {{else}}
+            Thanks for doing business with us!
+        {{/if}}
+    </div>
+
+    <div class="signatures">
+        <div class="sig-box">
+            <div class="sig-header">Received By</div>
+            <div class="sig-field"><label>Name:</label> __________________</div>
+            <div class="sig-field"><label>Comment:</label> __________________</div>
+            <div class="sig-field"><label>Date:</label> __________________</div>
+            <div class="sig-field" style="margin-top: 20px;"><label>Signature:</label></div>
+        </div>
+        
+        <div class="sig-box">
+            <div class="sig-header">Delivered By</div>
+            <div class="sig-field"><label>Name:</label> __________________</div>
+            <div class="sig-field"><label>Comment:</label> __________________</div>
+            <div class="sig-field"><label>Date:</label> __________________</div>
+            <div class="sig-field" style="margin-top: 20px;"><label>Signature:</label></div>
+        </div>
+        
+        <div class="sig-box" style="border: none;">
+            <div class="company-seal">
+                <div style="margin-bottom: 20px;">For : GRIVETY GLOBAL PRIVATE LIMITED</div>
+                <div class="bold" style="margin-top: 60px;">Authorized Signatory</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

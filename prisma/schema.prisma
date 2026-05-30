@@ -1,0 +1,399 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum AccountType {
+  INDIVIDUAL
+  BUSINESS
+}
+
+model User {
+  id          String      @id @default(uuid())
+  accountType AccountType
+  fullName    String?
+  companyName String?
+  phoneCode   String
+  phoneNumber String
+  email       String      @unique
+  password    String
+  country     String
+  state       String
+  city        String
+  
+  customers   Customer[]
+  vendors     Vendor[]
+  products    Product[]
+  projects    Project[]
+  quotations  Quotation[]
+  deliveryChallans DeliveryChallan[]
+  settings    UserSettings?
+
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+enum CustomerType {
+  INDIVIDUAL
+  BUSINESS
+}
+
+enum TaxPreference {
+  TAXABLE
+  TAX_EXEMPT
+}
+
+model Customer {
+  id                      String        @id @default(uuid())
+  customerType            CustomerType
+  displayName             String
+  primaryContactTitle     String?
+  primaryContactFirstName String
+  primaryContactLastName  String
+  companyName             String?
+  email                   String
+  customerLanguage        String
+  workPhoneCode           String?
+  workPhone               String?
+  mobilePhoneCode         String?
+  mobilePhone             String?
+  currency                String
+  gstTreatment            String?
+  pan                     String?
+  paymentTerms            String?
+  placeOfSupply           String?
+  taxPreference           TaxPreference @default(TAXABLE)
+  websiteUrl              String?
+  department              String?
+  designation             String?
+  skypeAddress            String?
+  xProfileLink            String?
+  facebookPage            String?
+  allowPortalAccess       Boolean       @default(false)
+  documentsAttachment     String?
+
+  // Address Mapping - Billing
+  billingAttention        String?
+  billingStreet1          String?
+  billingStreet2          String?
+  billingCountry          String?
+  billingState            String?
+  billingCity             String?
+  billingZipCode          String?
+  billingPhone            String?
+  billingFax              String?
+
+  // Address Mapping - Shipping
+  shippingAttention       String?
+  shippingStreet1         String?
+  shippingStreet2         String?
+  shippingCountry         String?
+  shippingState           String?
+  shippingCity            String?
+  shippingZipCode         String?
+  shippingPhone           String?
+  shippingFax             String?
+
+  // Internal Remarks
+  internalRemarks         String? @db.Text
+
+  // Relations
+  userId                  String
+  user                    User          @relation(fields: [userId], references: [id])
+  contactPersons          CustomerContactPerson[]
+  customFields            CustomerCustomField[]
+  projects                Project[]
+  quotations              Quotation[]
+  deliveryChallans        DeliveryChallan[]
+
+  createdAt               DateTime      @default(now())
+  updatedAt               DateTime      @updatedAt
+}
+
+model CustomerContactPerson {
+  id         String   @id @default(uuid())
+  salutation String?
+  firstName  String
+  lastName   String
+  email      String
+  
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+}
+
+model CustomerCustomField {
+  id         String   @id @default(uuid())
+  key        String
+  value      String
+  
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+}
+
+enum VendorType {
+  INDIVIDUAL
+  BUSINESS
+}
+
+model Vendor {
+  id                      String        @id @default(uuid())
+  vendorType              VendorType
+  displayName             String
+  primaryContactTitle     String?
+  primaryContactFirstName String
+  primaryContactLastName  String
+  companyName             String?
+  email                   String
+  vendorLanguage          String
+  workPhoneCode           String?
+  workPhone               String?
+  mobilePhoneCode         String?
+  mobilePhone             String?
+  currency                String
+  pan                     String?
+  paymentTerms            String?
+  websiteUrl              String?
+  department              String?
+  designation             String?
+  skypeAddress            String?
+  xProfileLink            String?
+  facebookPage            String?
+  allowPortalAccess       Boolean       @default(false)
+  documentsAttachment     String?
+
+  // Address Mapping - Billing
+  billingAttention        String?
+  billingStreet1          String?
+  billingStreet2          String?
+  billingCountry          String?
+  billingState            String?
+  billingCity             String?
+  billingZipCode          String?
+  billingPhone            String?
+  billingFax              String?
+
+  // Address Mapping - Shipping
+  shippingAttention       String?
+  shippingStreet1         String?
+  shippingStreet2         String?
+  shippingCountry         String?
+  shippingState           String?
+  shippingCity            String?
+  shippingZipCode         String?
+  shippingPhone           String?
+  shippingFax             String?
+
+  // Internal Remarks
+  internalRemarks         String? @db.Text
+
+  // Relations
+  userId                  String
+  user                    User          @relation(fields: [userId], references: [id])
+  contactPersons          VendorContactPerson[]
+  customFields            VendorCustomField[]
+  projectVendors          ProjectVendor[]
+
+  createdAt               DateTime      @default(now())
+  updatedAt               DateTime      @updatedAt
+}
+
+model VendorContactPerson {
+  id         String   @id @default(uuid())
+  salutation String?
+  firstName  String
+  lastName   String
+  email      String
+  
+  vendorId   String
+  vendor     Vendor   @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+}
+
+model VendorCustomField {
+  id         String   @id @default(uuid())
+  key        String
+  value      String
+  
+  vendorId   String
+  vendor     Vendor   @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+}
+
+enum ItemType {
+  GOODS
+  SERVICE
+}
+
+model Product {
+  id                  String        @id @default(uuid())
+  name                String
+  type                ItemType      @default(GOODS)
+  unit                String?
+  hsnCode             String?
+  taxPreference       TaxPreference @default(TAXABLE)
+  itemImage           String?
+  
+  sellingPrice        Float
+  description         String?       @db.Text
+  
+  intraStateTaxRate   String?
+  interStateTaxRate   String?
+
+  userId              String
+  user                User          @relation(fields: [userId], references: [id])
+  quotationItems      QuotationItem[]
+  deliveryChallanItems DeliveryChallanItem[]
+
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+}
+
+model Project {
+  id          String    @id @default(uuid())
+  projectName String
+  
+  customerId  String
+  customer    Customer  @relation(fields: [customerId], references: [id])
+  
+  vendors     ProjectVendor[]
+  quotations  Quotation[]
+  
+  currency    String    @default("INR")
+  budget      Float
+  dueDate     DateTime
+  
+  userId      String
+  user        User      @relation(fields: [userId], references: [id])
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model ProjectVendor {
+  projectId String
+  vendorId  String
+  
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  vendor    Vendor  @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+
+  @@id([projectId, vendorId])
+}
+
+model Quotation {
+  id              String    @id @default(uuid())
+  quoteNumber     String    @unique
+  referenceNumber String?
+  quoteDate       DateTime
+  expiryDate      DateTime?
+  salesperson     String?
+  subject         String?
+  
+  customerNotes   String?   @db.Text
+  termsConditions String?   @db.Text
+  attachments     String[]
+
+  subTotal        Float
+  discountType    String?
+  discountValue   Float?
+  tdsTcs          String?
+  adjustment      Float?
+  totalAmount     Float
+
+  customerId      String
+  customer        Customer  @relation(fields: [customerId], references: [id])
+  
+  projectId       String?
+  project         Project?  @relation(fields: [projectId], references: [id])
+
+  userId          String
+  user            User      @relation(fields: [userId], references: [id])
+
+  items           QuotationItem[]
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+model QuotationItem {
+  id            String    @id @default(uuid())
+  quotationId   String
+  quotation     Quotation @relation(fields: [quotationId], references: [id], onDelete: Cascade)
+  
+  productId     String?
+  product       Product?  @relation(fields: [productId], references: [id])
+  
+  customDetails String?
+  quantity      Float
+  rate          Float
+  tax           String?
+  amount        Float
+}
+
+model UserSettings {
+  id                    String    @id @default(uuid())
+  userId                String    @unique
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  workspaceBrandName    String?
+  billingEmailContact   String?
+  adminProfileName      String?
+  
+  standardTaxGst        Float?    @default(0)
+  standardBaseCurrency  String?   @default("INR")
+  
+  profileAvatarUrl      String?
+  brandLogoUrls         String[]
+  billingAddresses      String[]
+  
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+}
+
+model DeliveryChallan {
+  id              String    @id @default(uuid())
+  challanNumber   String    @unique
+  referenceNumber String?
+  challanDate     DateTime
+  challanType     String?
+  
+  customerNotes   String?   @db.Text
+  termsConditions String?   @db.Text
+  attachments     String[]
+
+  subTotal        Float
+  discountType    String?
+  discountValue   Float?
+  adjustment      Float?
+  totalAmount     Float
+
+  transportMode   String?
+  deliveryLocation String?
+  euPoWoNumber    String?
+
+  customerId      String
+  customer        Customer  @relation(fields: [customerId], references: [id])
+
+  userId          String
+  user            User      @relation(fields: [userId], references: [id])
+
+  items           DeliveryChallanItem[]
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+model DeliveryChallanItem {
+  id                String    @id @default(uuid())
+  deliveryChallanId String
+  deliveryChallan   DeliveryChallan @relation(fields: [deliveryChallanId], references: [id], onDelete: Cascade)
+  
+  productId         String?
+  product           Product?  @relation(fields: [productId], references: [id])
+  
+  customDetails     String?
+  quantity          Float
+  rate              Float
+  amount            Float
+}
