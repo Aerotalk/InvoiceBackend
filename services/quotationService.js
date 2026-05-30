@@ -1,5 +1,5 @@
 const QuotationModel = require('../models/quotationModel');
-const puppeteer = require('puppeteer');
+// Puppeteer dynamically imported in generatePdf
 const handlebars = require('handlebars');
 const fs = require('fs');
 const path = require('path');
@@ -78,6 +78,9 @@ const generatePdf = async (id) => {
     };
 
     const finalHtml = template(data);
+
+    const puppeteerModule = await import('puppeteer');
+    const puppeteer = puppeteerModule.default || puppeteerModule;
 
     const browser = await puppeteer.launch({
         headless: "new",
