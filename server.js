@@ -74,13 +74,18 @@ app.use(morgan('combined', { stream: { write: message => logger.info(message.tri
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Routes
-// Health Check Route
+// Health // Default Route
 app.get('/', (req, res) => {
+    res.send('InvoiceIQ API is running...');
+});
+
+// Health Status Endpoint
+app.get('/health', (req, res) => {
     res.status(200).json({
-        message: 'InvoiceIQ API is running',
-        status: 'OK',
-        timestamp: new Date().toISOString(),
-        version: '1.0.0'
+        success: true,
+        status: '🟢 UP',
+        message: '🚀 InvoiceIQ Backend is up and running smoothly! ✨',
+        timestamp: new Date().toISOString()
     });
 });
 
