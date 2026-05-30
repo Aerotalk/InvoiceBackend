@@ -10,11 +10,15 @@ const generateToken = (id) => {
 };
 
 const registerUser = async (data) => {
-    const { 
+    let { 
       accountType, fullName, companyName, 
       phoneCode, phoneNumber, email, password, 
       country, state, city 
     } = data;
+
+    if (accountType) {
+        accountType = accountType.toUpperCase();
+    }
 
     if (!accountType || !email || !password || !phoneCode || !phoneNumber || !country || !state || !city) {
       throw new AppError('Please provide all required fields', 400);
@@ -51,10 +55,14 @@ const registerUser = async (data) => {
     });
 
     return {
-        id: user.id,
-        email: user.email,
-        accountType: user.accountType,
         token: generateToken(user.id),
+        user: {
+            id: user.id,
+            email: user.email,
+            accountType: user.accountType,
+            fullName: user.fullName,
+            companyName: user.companyName
+        }
     };
 };
 
@@ -73,10 +81,14 @@ const loginUser = async (email, password) => {
 
     if (isPasswordValid) {
       return {
-        id: user.id,
-        email: user.email,
-        accountType: user.accountType,
         token: generateToken(user.id),
+        user: {
+            id: user.id,
+            email: user.email,
+            accountType: user.accountType,
+            fullName: user.fullName,
+            companyName: user.companyName
+        }
       };
     } else {
       throw new AppError('Incorrect password', 401);

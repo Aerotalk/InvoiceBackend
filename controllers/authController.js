@@ -4,14 +4,14 @@ const asyncHandler = require('../utils/asyncHandler');
 
 const registerUser = asyncHandler(async (req, res, next) => {
   const result = await authService.registerUser(req.body);
-  logger.info(`New user registered: ${result.email}`);
-  res.status(201).json({ success: true, data: result });
+  logger.info(`New user registered: ${result.user.email}`);
+  res.status(201).json({ success: true, token: result.token, user: result.user });
 });
 
 const loginUser = asyncHandler(async (req, res, next) => {
   const result = await authService.loginUser(req.body.email, req.body.password);
-  logger.info(`User logged in: ${result.email}`);
-  res.status(200).json({ success: true, data: result });
+  logger.info(`User logged in: ${result.user.email}`);
+  res.status(200).json({ success: true, token: result.token, user: result.user });
 });
 
 const getMe = asyncHandler(async (req, res, next) => {
