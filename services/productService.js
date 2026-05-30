@@ -11,8 +11,17 @@ const createProduct = async (data) => {
     }
 
     const productData = {
-        ...data,
-        sellingPrice
+        name: data.name,
+        type: data.type ? data.type.toUpperCase() : 'GOODS',
+        unit: data.unit || null,
+        hsnCode: data.hsnCode || null,
+        taxPreference: data.taxPreference === 'Tax Exempt' ? 'TAX_EXEMPT' : 'TAXABLE',
+        itemImage: data.imageUrl || data.itemImage || null,
+        sellingPrice,
+        description: data.description || null,
+        intraStateTaxRate: data.intraStateTaxRate || null,
+        interStateTaxRate: data.interStateTaxRate || null,
+        userId: data.userId
     };
 
     return await ProductModel.createProduct(productData);

@@ -9,13 +9,27 @@ const createQuotation = async (data) => {
         throw new Error('Quote Number, Customer, Quote Date, Total Amount, and User ID are required');
     }
 
-    const { items, ...quotationData } = data;
-
     const prismaCreateData = {
-        ...quotationData,
+        quoteNumber: data.quoteNumber,
+        referenceNumber: data.referenceNumber || null,
+        customerId: data.customerId,
+        projectId: data.projectId || null,
+        userId: data.userId,
         quoteDate: new Date(data.quoteDate),
         expiryDate: data.expiryDate ? new Date(data.expiryDate) : null,
-        items: items && items.length > 0 ? {
+        salesperson: data.salesperson || null,
+        subject: data.subject || null,
+        customerNotes: data.customerNotes || null,
+        termsConditions: data.termsConditions || null,
+        
+        subTotal: parseFloat(data.subTotal || 0),
+        discountType: data.discountType || (data.discountRate ? 'percentage' : null),
+        discountValue: parseFloat(data.discountValue || data.discountRate || 0),
+        tdsTcs: data.tdsTcs || null,
+        adjustment: parseFloat(data.adjustment || 0),
+        totalAmount: parseFloat(data.totalAmount || 0),
+        
+        items: data.items && data.items.length > 0 ? {
             create: items.map(item => ({
                 productId: item.productId,
                 customDetails: item.customDetails,

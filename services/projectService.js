@@ -1,7 +1,10 @@
 const ProjectModel = require('../models/projectModel');
 
 const createProject = async (data) => {
-    if (!data.projectName || !data.customerId || data.budget === undefined || !data.dueDate || !data.userId) {
+    const projectName = data.projectName || data.name;
+    const customerId = data.customerId || data.clientId;
+    
+    if (!projectName || !customerId || data.budget === undefined || !data.dueDate || !data.userId) {
         throw new Error('Project Name, Client, Budget, Due Date, and User ID are required');
     }
     
@@ -17,15 +20,25 @@ const createProject = async (data) => {
         throw new Error('Invalid Due Date format');
     }
 
-    const { vendorIds, ...projectData } = data;
+    // Map vendorIds array from either raw IDs or array of objects
+    let vendorIdsToConnect = [];
+    if (data.vendors && Array.isArray(data.vendors)) {
+        vendorIdsToConnect = data.vendors.map(v => typeof v === 'string' ? v : v.id).filter(Boolean);
+    } else if (data.vendorIds && Array.isArray(data.vendorIds)) {
+        vendorIdsToConnect = data.vendorIds;
+    }
 
     const prismaCreateData = {
-        ...projectData,
+        projectName,
+        customerId,
         budget,
+        currency: data.currency || 'INR',
         dueDate,
+        userId: data.userId,
+        
         // Map vendorIds array into ProjectVendor join table
-        vendors: vendorIds && vendorIds.length > 0 ? {
-            create: vendorIds.map(vId => ({ vendorId: vId }))
+        vendors: vendorIdsToConnect.length > 0 ? {
+            create: vendorIdsToConnect.map(vId => ({ vendorId: vId }))
         } : undefined
     };
 

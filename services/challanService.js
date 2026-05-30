@@ -5,17 +5,31 @@ const fs = require('fs');
 const path = require('path');
 
 const createChallan = async (data) => {
-    if (!data.challanNumber || !data.customerId || !data.challanDate || data.totalAmount === undefined || !data.userId) {
-        throw new Error('Challan Number, Customer, Challan Date, Total Amount, and User ID are required');
+    if (!data.challanNumber || !data.customerId || !data.challanDate || !data.userId) {
+        throw new Error('Challan Number, Customer, Challan Date, and User ID are required');
     }
 
-    const { items, ...challanData } = data;
-
     const prismaCreateData = {
-        ...challanData,
+        challanNumber: data.challanNumber,
+        referenceNumber: data.referenceNumber || null,
+        customerId: data.customerId,
+        userId: data.userId,
         challanDate: new Date(data.challanDate),
-        items: items && items.length > 0 ? {
-            create: items.map(item => ({
+        challanType: data.challanType || null,
+        customerNotes: data.customerNotes || null,
+        termsConditions: data.termsConditions || null,
+        
+        subTotal: parseFloat(data.subTotal || 0),
+        discountType: data.discountType || null,
+        discountValue: parseFloat(data.discountValue || 0),
+        adjustment: parseFloat(data.adjustment || 0),
+        totalAmount: parseFloat(data.totalAmount || 0),
+        
+        transportMode: data.transportMode || null,
+        deliveryLocation: data.deliveryLocation || null,
+        euPoWoNumber: data.euPoWoNumber || null,
+        items: data.items && data.items.length > 0 ? {
+            create: data.items.map(item => ({
                 productId: item.productId,
                 customDetails: item.customDetails,
                 quantity: parseFloat(item.quantity || 0),
