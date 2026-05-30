@@ -39,7 +39,8 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 // Dynamic CORS Configuration
 const allowedOrigins = [
     'http://localhost:5173', // Local Vite Frontend
-    'http://localhost:5000', // Local Backend
+    'http://localhost:5000',
+    'https://invoicefrontend-black.vercel.app' // Local Backend
 ];
 
 if (process.env.FRONTEND_URL) {
@@ -171,8 +172,8 @@ logger.info('⏳ Attempting to start server...');
 
 if (require.main === module || process.env.NODE_ENV === 'production') {
     try {
-        const server = app.listen(PORT, () => {
-            logger.info(`🚀 Server running on port ${PORT}`);
+        const server = app.listen(PORT, '0.0.0.0', () => {
+            logger.info(`🚀 Server running on port ${PORT} (0.0.0.0)`);
         });
 
         server.on('error', (err) => {
