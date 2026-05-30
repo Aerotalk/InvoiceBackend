@@ -37,11 +37,23 @@ const errorHandler = (err, req, res, next) => {
     error = new AppError(message, 401);
   }
 
+  // Catch any other unhandled Prisma errors
+  if (err.name && err.name.startsWith('PrismaClient') && !error.isOperational) {
+    const message = 'A database error occurred. Please try again later.';
+    error = new AppError(message, 500);
+  }
+
   const statusCode = error.statusCode || err.statusCode || 500;
   
+  // For unhandled 500 errors, hide the actual message from the client to prevent leaking sensitive details
+  let clientMessage = error.message || err.message || 'Internal Server Error';
+  if (statusCode === 500 && !error.isOperational) {
+    clientMessage = 'An unexpected internal error occurred. Please try again later.';
+  }
+
   res.status(statusCode).json({
     success: false,
-    message: error.message || err.message || 'Internal Server Error',
+    message: clientMessage,
     ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
   });
 };
