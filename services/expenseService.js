@@ -1,0 +1,83 @@
+const ExpenseModel = {
+    async createExpense(data) {
+        return require('../models/expenseModel').createExpense(data);
+    },
+    async createManyExpenses(dataArray) {
+        return require('../models/expenseModel').createManyExpenses(dataArray);
+    },
+    async findExpenseById(id) {
+        return require('../models/expenseModel').findExpenseById(id);
+    },
+    async findAllExpenses(userId) {
+        return require('../models/expenseModel').findAllExpenses(userId);
+    },
+    async deleteExpense(id) {
+        return require('../models/expenseModel').deleteExpense(id);
+    }
+};
+
+const expenseService = {
+    async createExpense(userId, expenseData) {
+        const payload = {
+            ...expenseData,
+            userId,
+            date: new Date(expenseData.date)
+        };
+        // Clean out undefined or empty relations if not selected
+        if (!payload.customerId) delete payload.customerId;
+        if (!payload.vendorId) delete payload.vendorId;
+        if (!payload.projectId) delete payload.projectId;
+
+        // Clean out frontend extra keys
+        delete payload.clientName;
+        delete payload.vendorName;
+        delete payload.projectName;
+
+        return ExpenseModel.createExpense(payload);
+    },
+    async createExpensesBulk(userId, expensesArray) {
+        const payload = expensesArray.map(expenseData => {
+            const exp = {
+                ...expenseData,
+                userId,
+                date: new Date(expenseData.date)
+            };
+            if (!exp.customerId) delete exp.customerId;
+            if (!exp.vendorId) delete exp.vendorId;
+            if (!exp.projectId) delete exp.projectId;
+
+            delete exp.clientName;
+            delete exp.vendorName;
+            delete exp.projectName;
+            
+            return exp;
+        });
+
+        return ExpenseModel.createManyExpenses(payload);
+    },
+    async getExpenses(userId) {
+        const expenses = await ExpenseModel.findAllExpenses(userId);
+        return expenses.map(exp => ({
+            ...exp,
+            clientName: exp.customer ? (exp.customer.displayName || exp.customer.companyName) : null,
+            vendorName: exp.vendor ? (exp.vendor.displayName || exp.vendor.companyName) : null,
+            projectName: exp.project ? exp.project.projectName : null
+        }));
+    },
+    async getExpenseById(id, userId) {
+        const expense = await ExpenseModel.findExpenseById(id);
+        if (!expense || expense.userId !== userId) {
+            throw new Error('Expense not found or unauthorized');
+        }
+        return expense;
+    },
+    async deleteExpense(id, userId) {
+        const expense = await ExpenseModel.findExpenseById(id);
+        if (!expense || expense.userId !== userId) {
+            throw new Error('Expense not found or unauthorized');
+        }
+        return ExpenseModel.deleteExpense(id);
+    }
+};
+
+module.exports = expenseService;
