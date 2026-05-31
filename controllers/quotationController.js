@@ -44,7 +44,7 @@ const downloadQuotationPdf = asyncHandler(async (req, res, next) => {
     logger.info(`🎉 Successfully generated PDF for quotation: ${quotation.quoteNumber} 📄 ✅`);
 
     res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename=${quotation.quoteNumber}.pdf`);
+    res.setHeader('Content-Disposition', `inline; filename=${quotation.quoteNumber}.pdf`);
     res.status(200).send(pdfBuffer);
 });
 

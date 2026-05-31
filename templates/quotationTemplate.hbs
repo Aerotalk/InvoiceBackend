@@ -88,21 +88,27 @@
         <tbody>
             {{#each items}}
             <tr>
-                <td>{{this.index}}</td>
-                <td><strong>{{this.name}}</strong></td>
-                <td>{{this.hsn}}</td>
-                <td class="text-right">{{this.quantity}}</td>
-                <td>{{this.unit}}</td>
-                <td class="text-right">₹ {{this.rate}}</td>
-                <td class="text-right">₹ {{this.taxableAmount}}</td>
-                <td class="text-right">{{this.tax}}</td>
-                <td class="text-right">₹ {{this.amount}}</td>
+                <td style="vertical-align: top;">{{this.index}}</td>
+                <td style="vertical-align: top;">
+                    <strong>{{this.name}}</strong>
+                    {{#if this.description}}
+                    <div style="font-size: 8.5px; color: #555; margin-top: 3px; white-space: pre-wrap;">{{this.description}}</div>
+                    {{/if}}
+                </td>
+                <td style="vertical-align: top;">{{this.hsn}}</td>
+                <td class="text-right" style="vertical-align: top;">{{this.quantity}}</td>
+                <td style="vertical-align: top;">{{this.unit}}</td>
+                <td class="text-right" style="vertical-align: top;">₹ {{this.rate}}</td>
+                <td class="text-right" style="vertical-align: top;">₹ {{this.taxableAmount}}</td>
+                <td class="text-right" style="vertical-align: top;">{{this.tax}}</td>
+                <td class="text-right" style="vertical-align: top;">₹ {{this.amount}}</td>
             </tr>
             {{/each}}
             <tr>
                 <td colspan="3"><strong>Total</strong></td>
-                <td class="text-right"><strong>{{items.length}}</strong></td>
-                <td colspan="3" class="text-right"><strong>₹ {{subTotal}}</strong></td>
+                <td class="text-right"><strong>{{totalQuantity}}</strong></td>
+                <td colspan="2"></td>
+                <td class="text-right"><strong>₹ {{subTotal}}</strong></td>
                 <td class="text-right"><strong>₹ {{totalTax}}</strong></td>
                 <td class="text-right"><strong>₹ {{totalAmount}}</strong></td>
             </tr>

@@ -44,7 +44,7 @@ const downloadChallanPdf = asyncHandler(async (req, res, next) => {
     logger.info(`🎉 Successfully generated PDF for delivery challan: ${challan.challanNumber} 📄 ✅`);
 
     res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename=${challan.challanNumber}.pdf`);
+    res.setHeader('Content-Disposition', `inline; filename=${challan.challanNumber}.pdf`);
     res.status(200).send(pdfBuffer);
 });
 

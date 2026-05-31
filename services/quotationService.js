@@ -62,6 +62,30 @@ const generatePdf = async (id) => {
 
     const template = handlebars.compile(templateHtml);
 
+    const numberToWords = (amount) => {
+        if (amount === 0) return "Zero Rupees only";
+        const a = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+        const b = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+        const inWords = (num) => {
+            if ((num = num.toString()).length > 9) return 'overflow';
+            const n = ('000000000' + num).substr(-9).match(/^(\d{2})(\d{2})(\d{2})(\d{1})(\d{2})$/);
+            if (!n) return '';
+            let str = '';
+            str += (n[1] != 0) ? (a[Number(n[1])] || b[n[1][0]] + ' ' + a[n[1][1]]) + ' Crore ' : '';
+            str += (n[2] != 0) ? (a[Number(n[2])] || b[n[2][0]] + ' ' + a[n[2][1]]) + ' Lakh ' : '';
+            str += (n[3] != 0) ? (a[Number(n[3])] || b[n[3][0]] + ' ' + a[n[3][1]]) + ' Thousand ' : '';
+            str += (n[4] != 0) ? (a[Number(n[4])] || b[n[4][0]] + ' ' + a[n[4][1]]) + ' Hundred ' : '';
+            str += (n[5] != 0) ? ((str != '') ? 'and ' : '') + (a[Number(n[5])] || b[n[5][0]] + ' ' + a[n[5][1]]) : '';
+            return str.trim();
+        };
+        const parts = amount.toString().split('.');
+        const rupees = parseInt(parts[0], 10);
+        const paise = parts.length > 1 ? parseInt(parts[1].padEnd(2, '0').substring(0,2), 10) : 0;
+        let result = inWords(rupees) + ' Rupees';
+        if (paise > 0) result += ' and ' + inWords(paise) + ' Paise';
+        return result + ' only';
+    };
+
     const data = {
         quoteNumber: quotation.quoteNumber,
         referenceNumber: quotation.referenceNumber,
@@ -72,6 +96,7 @@ const generatePdf = async (id) => {
         items: quotation.items.map((item, index) => ({
             index: index + 1,
             name: item.product ? item.product.name : (item.customDetails || 'Custom Item'),
+            description: item.customDetails || (item.product ? item.product.description : ''),
             hsn: item.product ? (item.product.hsnCode || '-') : '-',
             quantity: item.quantity,
             unit: item.product ? (item.product.unit || 'Nos') : 'Nos',
@@ -80,6 +105,7 @@ const generatePdf = async (id) => {
             tax: item.tax || '0%',
             amount: item.amount.toFixed(2)
         })),
+        totalQuantity: quotation.items.reduce((sum, item) => sum + item.quantity, 0),
         subTotal: quotation.subTotal.toFixed(2),
         totalAmount: quotation.totalAmount.toFixed(2),
         termsConditions: quotation.termsConditions,
@@ -88,7 +114,7 @@ const generatePdf = async (id) => {
         totalTax: (quotation.totalAmount - quotation.subTotal).toFixed(2),
         sgst: ((quotation.totalAmount - quotation.subTotal) / 2).toFixed(2),
         cgst: ((quotation.totalAmount - quotation.subTotal) / 2).toFixed(2),
-        totalAmountInWords: "Two Lakh Fifty Thousand Seven Hundred Fifty Rupees only" // Placeholder
+        totalAmountInWords: numberToWords(quotation.totalAmount)
     };
 
     const finalHtml = template(data);
