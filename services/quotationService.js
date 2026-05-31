@@ -30,7 +30,7 @@ const createQuotation = async (data) => {
         totalAmount: parseFloat(data.totalAmount || 0),
         
         items: data.items && data.items.length > 0 ? {
-            create: items.map(item => ({
+            create: data.items.map(item => ({
                 productId: item.productId,
                 customDetails: item.customDetails,
                 quantity: parseFloat(item.quantity || 0),
