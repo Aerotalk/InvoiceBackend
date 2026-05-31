@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { createVendor, getVendors, getVendorById } = require('../controllers/vendorController');
+const { createVendor, getVendors, getVendorById, updateVendor, deleteVendor } = require('../controllers/vendorController');
 const { protect } = require('../middlewares/authMiddleware');
 
 router.route('/')
@@ -8,6 +8,8 @@ router.route('/')
     .get(protect, getVendors);
 
 router.route('/:id')
-    .get(protect, getVendorById);
+    .get(protect, getVendorById)
+    .put(protect, updateVendor)
+    .delete(protect, deleteVendor);
 
 module.exports = router;

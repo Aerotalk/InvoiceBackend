@@ -113,6 +113,13 @@ try {
 }
 
 try {
+    app.use('/api/vendors', require('./routes/vendorRoutes'));
+    logger.debug('🏭 Vendor routes registered');
+} catch (error) {
+    logger.error('❌ Failed to load Vendor Routes:', error);
+}
+
+try {
     app.use('/api/payments', require('./routes/paymentRoutes'));
     logger.debug('💳 Payment routes registered');
 } catch (error) {

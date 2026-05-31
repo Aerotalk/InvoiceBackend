@@ -1,11 +1,17 @@
 const VendorModel = require('../models/vendorModel');
+const logger = require('../utils/logger');
 
+// @desc    Create new vendor
+// @access  Internal Service Layer
 const createVendor = async (data) => {
+    logger.debug(`🐞 🏭 [VENDOR_SERVICE] 📝 Preparing vendor data for creation`);
+    
     if (!data.displayName || !data.email || !data.userId) {
+        logger.warn('⚠️ 🏭 [VENDOR_SERVICE] ⚠️ Missing required fields: Display Name, Email, or User ID');
         throw new Error('Display Name, Email, and User ID are required');
     }
     
-    const prismaCreateData = {
+    const vendorData = {
         vendorType: data.vendorType ? data.vendorType.toUpperCase() : 'BUSINESS',
         displayName: data.displayName,
         primaryContactTitle: data.salutation || 'Mr.',
@@ -72,21 +78,51 @@ const createVendor = async (data) => {
         } : undefined
     };
 
-    return await VendorModel.createVendor(prismaCreateData);
+    logger.debug(`🐞 🏭 [VENDOR_SERVICE] 🚀 Saving vendor to database...`);
+    return await VendorModel.createVendor(vendorData);
 };
 
+// @desc    Get all vendors by User ID
+// @access  Internal Service Layer
 const getVendorsByUser = async (userId) => {
+    logger.debug(`🐞 🏭 [VENDOR_SERVICE] 📋 Fetching vendors for user ${userId}`);
     return await VendorModel.findAllVendors(userId);
 };
 
+// @desc    Get vendor by ID
+// @access  Internal Service Layer
 const getVendorById = async (id) => {
+    logger.debug(`🐞 🏭 [VENDOR_SERVICE] 🔍 Looking up vendor ID ${id}`);
     const vendor = await VendorModel.findVendorById(id);
-    if (!vendor) throw new Error('Vendor not found');
+    if (!vendor) {
+        logger.warn(`⚠️ 🏭 [VENDOR_SERVICE] ⚠️ Vendor not found in DB: ${id}`);
+        throw new Error('Vendor not found');
+    }
     return vendor;
+};
+
+// @desc    Update vendor
+// @access  Internal Service Layer
+const updateVendor = async (id, data) => {
+    logger.debug(`🐞 🏭 [VENDOR_SERVICE] ✏️ Preparing updates for vendor ${id}`);
+    const updates = {};
+    if (data.notes !== undefined) {
+        updates.internalRemarks = data.notes;
+    }
+    return await VendorModel.updateVendor(id, updates);
+};
+
+// @desc    Delete vendor
+// @access  Internal Service Layer
+const deleteVendor = async (id) => {
+    logger.debug(`🐞 🏭 [VENDOR_SERVICE] 🗑️ Executing deletion for vendor ${id}`);
+    return await VendorModel.deleteVendor({ id });
 };
 
 module.exports = {
     createVendor,
     getVendorsByUser,
-    getVendorById
+    getVendorById,
+    updateVendor,
+    deleteVendor
 };
