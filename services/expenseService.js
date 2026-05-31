@@ -23,12 +23,19 @@ const expenseService = {
             userId,
             date: new Date(expenseData.date)
         };
+        
+        // Map clientId to customerId if present
+        if (payload.clientId) {
+            payload.customerId = payload.clientId;
+        }
+
         // Clean out undefined or empty relations if not selected
         if (!payload.customerId) delete payload.customerId;
         if (!payload.vendorId) delete payload.vendorId;
         if (!payload.projectId) delete payload.projectId;
 
         // Clean out frontend extra keys
+        delete payload.clientId;
         delete payload.clientName;
         delete payload.vendorName;
         delete payload.projectName;
@@ -42,10 +49,16 @@ const expenseService = {
                 userId,
                 date: new Date(expenseData.date)
             };
+            
+            if (exp.clientId) {
+                exp.customerId = exp.clientId;
+            }
+
             if (!exp.customerId) delete exp.customerId;
             if (!exp.vendorId) delete exp.vendorId;
             if (!exp.projectId) delete exp.projectId;
 
+            delete exp.clientId;
             delete exp.clientName;
             delete exp.vendorName;
             delete exp.projectName;
