@@ -45,6 +45,9 @@ const downloadQuotationPdf = asyncHandler(async (req, res, next) => {
 
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `inline; filename=${quotation.quoteNumber}.pdf`);
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
     res.status(200).send(pdfBuffer);
 });
 
