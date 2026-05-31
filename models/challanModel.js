@@ -3,13 +3,7 @@ const prisma = require('./index');
 const ChallanModel = {
     async createChallan(data) {
         return prisma.deliveryChallan.create({
-            data,
-            include: {
-                customer: true,
-                items: {
-                    include: { product: true }
-                }
-            }
+            data
         });
     },
     async findChallanById(id) {

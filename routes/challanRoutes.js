@@ -4,7 +4,9 @@ const {
     createChallan, 
     getChallans, 
     getChallanById,
-    downloadChallanPdf
+    downloadChallanPdf,
+    updateChallan,
+    deleteChallan
 } = require('../controllers/challanController');
 const { protect } = require('../middlewares/authMiddleware');
 
@@ -13,7 +15,9 @@ router.route('/')
     .get(protect, getChallans);
 
 router.route('/:id')
-    .get(protect, getChallanById);
+    .get(protect, getChallanById)
+    .put(protect, updateChallan)
+    .delete(protect, deleteChallan);
 
 router.route('/:id/pdf')
     .get(protect, downloadChallanPdf);

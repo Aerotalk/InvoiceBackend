@@ -4,7 +4,9 @@ const {
     createQuotation, 
     getQuotations, 
     getQuotationById,
-    downloadQuotationPdf
+    downloadQuotationPdf,
+    updateQuotation,
+    deleteQuotation
 } = require('../controllers/quotationController');
 const { protect } = require('../middlewares/authMiddleware');
 
@@ -13,7 +15,9 @@ router.route('/')
     .get(protect, getQuotations);
 
 router.route('/:id')
-    .get(protect, getQuotationById);
+    .get(protect, getQuotationById)
+    .put(protect, updateQuotation)
+    .delete(protect, deleteQuotation);
 
 router.route('/:id/pdf')
     .get(protect, downloadQuotationPdf);

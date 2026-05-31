@@ -108,9 +108,19 @@ const generatePdf = async (id) => {
     return pdfBuffer;
 };
 
+const updateChallan = async (id, updates) => {
+    return await ChallanModel.updateChallan(id, updates);
+};
+
+const deleteChallan = async (id) => {
+    return await ChallanModel.deleteChallan({ id });
+};
+
 module.exports = {
     createChallan,
     getChallansByUser,
     getChallanById,
-    generatePdf
+    generatePdf,
+    updateChallan,
+    deleteChallan
 };

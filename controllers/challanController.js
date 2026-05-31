@@ -48,9 +48,31 @@ const downloadChallanPdf = asyncHandler(async (req, res, next) => {
     res.status(200).send(pdfBuffer);
 });
 
+const updateChallan = asyncHandler(async (req, res, next) => {
+    logger.info(`📝 Updating delivery challan ${req.params.id}...`);
+    const challan = await challanService.getChallanById(req.params.id);
+    if (challan.userId !== req.user.id) {
+        throw new AppError('Not authorized', 403);
+    }
+    const updated = await challanService.updateChallan(req.params.id, req.body);
+    res.status(200).json({ success: true, data: updated });
+});
+
+const deleteChallan = asyncHandler(async (req, res, next) => {
+    logger.info(`🗑️ Deleting delivery challan ${req.params.id}...`);
+    const challan = await challanService.getChallanById(req.params.id);
+    if (challan.userId !== req.user.id) {
+        throw new AppError('Not authorized', 403);
+    }
+    await challanService.deleteChallan(req.params.id);
+    res.status(200).json({ success: true, data: {} });
+});
+
 module.exports = {
     createChallan,
     getChallans,
     getChallanById,
-    downloadChallanPdf
+    downloadChallanPdf,
+    updateChallan,
+    deleteChallan
 };

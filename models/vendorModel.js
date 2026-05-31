@@ -3,11 +3,7 @@ const prisma = require('./index');
 const VendorModel = {
     async createVendor(data) {
         return prisma.vendor.create({ 
-            data,
-            include: {
-                contactPersons: true,
-                customFields: true
-            }
+            data
         });
     },
     async findVendorById(id) {
@@ -36,11 +32,7 @@ const VendorModel = {
     async findAllVendors(userId) {
         const whereClause = userId ? { userId } : {};
         return prisma.vendor.findMany({ 
-            where: whereClause,
-            include: {
-                contactPersons: true,
-                customFields: true
-            }
+            where: whereClause
         });
     }
 };

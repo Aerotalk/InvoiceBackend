@@ -114,9 +114,19 @@ const generatePdf = async (id) => {
     return pdfBuffer;
 };
 
+const updateQuotation = async (id, updates) => {
+    return await QuotationModel.updateQuotation(id, updates);
+};
+
+const deleteQuotation = async (id) => {
+    return await QuotationModel.deleteQuotation({ id });
+};
+
 module.exports = {
     createQuotation,
     getQuotationsByUser,
     getQuotationById,
-    generatePdf
+    generatePdf,
+    updateQuotation,
+    deleteQuotation
 };

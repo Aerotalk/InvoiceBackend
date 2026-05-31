@@ -48,9 +48,31 @@ const downloadQuotationPdf = asyncHandler(async (req, res, next) => {
     res.status(200).send(pdfBuffer);
 });
 
+const updateQuotation = asyncHandler(async (req, res, next) => {
+    logger.info(`📝 Updating quotation ${req.params.id}...`);
+    const quotation = await quotationService.getQuotationById(req.params.id);
+    if (quotation.userId !== req.user.id) {
+        throw new AppError('Not authorized', 403);
+    }
+    const updated = await quotationService.updateQuotation(req.params.id, req.body);
+    res.status(200).json({ success: true, data: updated });
+});
+
+const deleteQuotation = asyncHandler(async (req, res, next) => {
+    logger.info(`🗑️ Deleting quotation ${req.params.id}...`);
+    const quotation = await quotationService.getQuotationById(req.params.id);
+    if (quotation.userId !== req.user.id) {
+        throw new AppError('Not authorized', 403);
+    }
+    await quotationService.deleteQuotation(req.params.id);
+    res.status(200).json({ success: true, data: {} });
+});
+
 module.exports = {
     createQuotation,
     getQuotations,
     getQuotationById,
-    downloadQuotationPdf
+    downloadQuotationPdf,
+    updateQuotation,
+    deleteQuotation
 };

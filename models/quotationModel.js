@@ -3,14 +3,7 @@ const prisma = require('./index');
 const QuotationModel = {
     async createQuotation(data) {
         return prisma.quotation.create({
-            data,
-            include: {
-                customer: true,
-                project: true,
-                items: {
-                    include: { product: true }
-                }
-            }
+            data
         });
     },
     async findQuotationById(id) {

@@ -3,11 +3,7 @@ const prisma = require('./index');
 const CustomerModel = {
     async createCustomer(data) {
         return prisma.customer.create({ 
-            data,
-            include: {
-                contactPersons: true,
-                customFields: true
-            }
+            data
         });
     },
     async findCustomerById(id) {
@@ -36,11 +32,7 @@ const CustomerModel = {
     async findAllCustomers(userId) {
         const whereClause = userId ? { userId } : {};
         return prisma.customer.findMany({ 
-            where: whereClause,
-            include: {
-                contactPersons: true,
-                customFields: true
-            }
+            where: whereClause
         });
     }
 };
