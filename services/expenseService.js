@@ -21,7 +21,9 @@ const expenseService = {
         const payload = {
             ...expenseData,
             userId,
-            date: new Date(expenseData.date)
+            date: new Date(expenseData.date),
+            taxableAmount: parseFloat(expenseData.taxableAmount || 0),
+            taxAmount: parseFloat(expenseData.taxAmount || 0)
         };
         
         // Map clientId to customerId if present
@@ -47,7 +49,9 @@ const expenseService = {
             const exp = {
                 ...expenseData,
                 userId,
-                date: new Date(expenseData.date)
+                date: new Date(expenseData.date),
+                taxableAmount: parseFloat(expenseData.taxableAmount || 0),
+                taxAmount: parseFloat(expenseData.taxAmount || 0)
             };
             
             if (exp.clientId) {

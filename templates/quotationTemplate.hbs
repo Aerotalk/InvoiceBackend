@@ -175,8 +175,15 @@
             <div>Account holder's name : GRIVETY GLOBAL PRIVATE LIMITED</div>
         </div>
         <div class="footer-col signature">
-            <div style="margin-top: 80px;">For : GRIVETY GLOBAL PRIVATE LIMITED</div>
-            <div style="margin-top: 50px; font-weight: bold;">Authorized Signatory</div>
+            <div style="margin-top: 40px;">For : GRIVETY GLOBAL PRIVATE LIMITED</div>
+            {{#if signatureUrl}}
+            <div style="margin-top: 10px;">
+                <img src="{{signatureUrl}}" alt="Signature" style="max-height: 50px; max-width: 150px; object-fit: contain;">
+            </div>
+            {{else}}
+            <div style="margin-top: 50px; border-bottom: 1px solid #000; width: 150px; display: inline-block;"></div>
+            {{/if}}
+            <div style="margin-top: 10px; font-weight: bold;">Authorized Signatory</div>
         </div>
     </div>
 </body>

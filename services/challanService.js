@@ -3,6 +3,7 @@ const ChallanModel = require('../models/challanModel');
 const handlebars = require('handlebars');
 const fs = require('fs');
 const path = require('path');
+const calculationUtils = require('../utils/calculationUtils');
 
 const createChallan = async (data) => {
     if (!data.challanNumber || !data.customerId || !data.challanDate || !data.userId) {
@@ -28,16 +29,34 @@ const createChallan = async (data) => {
         transportMode: data.transportMode || null,
         deliveryLocation: data.deliveryLocation || null,
         euPoWoNumber: data.euPoWoNumber || null,
+        signatureUrl: data.signatureUrl || null,
         items: data.items && data.items.length > 0 ? {
-            create: data.items.map(item => ({
-                productId: item.productId,
-                customDetails: item.customDetails,
-                quantity: parseFloat(item.quantity || 0),
-                rate: parseFloat(item.rate || 0),
-                amount: parseFloat(item.amount || 0)
-            }))
+            create: data.items.map(item => {
+                const calcs = calculationUtils.calculateLineItem(item.quantity, item.rate, item.tax);
+                return {
+                    productId: item.productId,
+                    customDetails: item.customDetails,
+                    quantity: parseFloat(item.quantity || 0),
+                    rate: parseFloat(item.rate || 0),
+                    tax: item.tax,
+                    taxAmount: calcs.taxAmount,
+                    amount: calcs.amount
+                };
+            })
         } : undefined
     };
+
+    // Recalculate totals properly
+    if (prismaCreateData.items && prismaCreateData.items.create) {
+        const totals = calculationUtils.calculateDocumentTotals(
+            prismaCreateData.items.create,
+            prismaCreateData.discountValue,
+            prismaCreateData.discountType,
+            prismaCreateData.adjustment
+        );
+        prismaCreateData.subTotal = totals.subTotal;
+        prismaCreateData.totalAmount = totals.totalAmount;
+    }
 
     return await ChallanModel.createChallan(prismaCreateData);
 };
@@ -111,11 +130,19 @@ const generatePdf = async (id) => {
         termsConditions: challan.termsConditions,
         customerNotes: challan.customerNotes,
         
-        totalTax: (challan.totalAmount - challan.subTotal).toFixed(2),
-        sgst: ((challan.totalAmount - challan.subTotal) / 2).toFixed(2),
-        cgst: ((challan.totalAmount - challan.subTotal) / 2).toFixed(2),
-        totalAmountInWords: numberToWords(challan.totalAmount)
+        totalTax: (challan.totalAmount - challan.subTotal + (challan.discountValue || 0) - (challan.adjustment || 0)).toFixed(2),
+        sgst: calculationUtils.calculateTaxSplit((challan.totalAmount - challan.subTotal + (challan.discountValue || 0) - (challan.adjustment || 0))).sgst.toFixed(2),
+        cgst: calculationUtils.calculateTaxSplit((challan.totalAmount - challan.subTotal + (challan.discountValue || 0) - (challan.adjustment || 0))).cgst.toFixed(2),
+        totalAmountInWords: numberToWords(challan.totalAmount),
+        signatureUrl: challan.signatureUrl
     };
+
+    // Better tax logic based on stored line items taxAmount
+    const totalTaxAmt = challan.items.reduce((sum, item) => sum + (item.taxAmount || 0), 0);
+    const taxSplit = calculationUtils.calculateTaxSplit(totalTaxAmt, false); // For now assuming intra-state
+    data.totalTax = totalTaxAmt.toFixed(2);
+    data.sgst = taxSplit.sgst.toFixed(2);
+    data.cgst = taxSplit.cgst.toFixed(2);
 
     const finalHtml = template(data);
 
@@ -141,6 +168,25 @@ const generatePdf = async (id) => {
 };
 
 const updateChallan = async (id, updates) => {
+    // If items are being updated, we should recalculate
+    if (updates.items) {
+        updates.items = updates.items.map(item => {
+            const calcs = calculationUtils.calculateLineItem(item.quantity, item.rate, item.tax);
+            return {
+                ...item,
+                taxAmount: calcs.taxAmount,
+                amount: calcs.amount
+            };
+        });
+        const totals = calculationUtils.calculateDocumentTotals(
+            updates.items,
+            updates.discountValue || 0,
+            updates.discountType,
+            updates.adjustment || 0
+        );
+        updates.subTotal = totals.subTotal;
+        updates.totalAmount = totals.totalAmount;
+    }
     return await ChallanModel.updateChallan(id, updates);
 };
 

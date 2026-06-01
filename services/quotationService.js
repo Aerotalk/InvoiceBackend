@@ -3,6 +3,7 @@ const QuotationModel = require('../models/quotationModel');
 const handlebars = require('handlebars');
 const fs = require('fs');
 const path = require('path');
+const calculationUtils = require('../utils/calculationUtils');
 
 const createQuotation = async (data) => {
     if (!data.quoteNumber || !data.customerId || !data.quoteDate || data.totalAmount === undefined || !data.userId) {
@@ -28,18 +29,34 @@ const createQuotation = async (data) => {
         tdsTcs: data.tdsTcs || null,
         adjustment: parseFloat(data.adjustment || 0),
         totalAmount: parseFloat(data.totalAmount || 0),
+        signatureUrl: data.signatureUrl || null,
         
         items: data.items && data.items.length > 0 ? {
-            create: data.items.map(item => ({
-                productId: item.productId,
-                customDetails: item.customDetails,
-                quantity: parseFloat(item.quantity || 0),
-                rate: parseFloat(item.rate || 0),
-                tax: item.tax,
-                amount: parseFloat(item.amount || 0)
-            }))
+            create: data.items.map(item => {
+                const calcs = calculationUtils.calculateLineItem(item.quantity, item.rate, item.tax);
+                return {
+                    productId: item.productId,
+                    customDetails: item.customDetails,
+                    quantity: parseFloat(item.quantity || 0),
+                    rate: parseFloat(item.rate || 0),
+                    tax: item.tax,
+                    taxAmount: calcs.taxAmount,
+                    amount: calcs.amount
+                };
+            })
         } : undefined
     };
+
+    if (prismaCreateData.items && prismaCreateData.items.create) {
+        const totals = calculationUtils.calculateDocumentTotals(
+            prismaCreateData.items.create,
+            prismaCreateData.discountValue,
+            prismaCreateData.discountType,
+            prismaCreateData.adjustment
+        );
+        prismaCreateData.subTotal = totals.subTotal;
+        prismaCreateData.totalAmount = totals.totalAmount;
+    }
 
     return await QuotationModel.createQuotation(prismaCreateData);
 };
@@ -111,11 +128,18 @@ const generatePdf = async (id) => {
         termsConditions: quotation.termsConditions,
         customerNotes: quotation.customerNotes,
         
-        totalTax: (quotation.totalAmount - quotation.subTotal).toFixed(2),
-        sgst: ((quotation.totalAmount - quotation.subTotal) / 2).toFixed(2),
-        cgst: ((quotation.totalAmount - quotation.subTotal) / 2).toFixed(2),
-        totalAmountInWords: numberToWords(quotation.totalAmount)
+        totalTax: (quotation.totalAmount - quotation.subTotal + (quotation.discountValue || 0) - (quotation.adjustment || 0)).toFixed(2),
+        sgst: calculationUtils.calculateTaxSplit((quotation.totalAmount - quotation.subTotal + (quotation.discountValue || 0) - (quotation.adjustment || 0))).sgst.toFixed(2),
+        cgst: calculationUtils.calculateTaxSplit((quotation.totalAmount - quotation.subTotal + (quotation.discountValue || 0) - (quotation.adjustment || 0))).cgst.toFixed(2),
+        totalAmountInWords: numberToWords(quotation.totalAmount),
+        signatureUrl: quotation.signatureUrl
     };
+
+    const totalTaxAmt = quotation.items.reduce((sum, item) => sum + (item.taxAmount || 0), 0);
+    const taxSplit = calculationUtils.calculateTaxSplit(totalTaxAmt, false);
+    data.totalTax = totalTaxAmt.toFixed(2);
+    data.sgst = taxSplit.sgst.toFixed(2);
+    data.cgst = taxSplit.cgst.toFixed(2);
 
     const finalHtml = template(data);
 
@@ -141,6 +165,24 @@ const generatePdf = async (id) => {
 };
 
 const updateQuotation = async (id, updates) => {
+    if (updates.items) {
+        updates.items = updates.items.map(item => {
+            const calcs = calculationUtils.calculateLineItem(item.quantity, item.rate, item.tax);
+            return {
+                ...item,
+                taxAmount: calcs.taxAmount,
+                amount: calcs.amount
+            };
+        });
+        const totals = calculationUtils.calculateDocumentTotals(
+            updates.items,
+            updates.discountValue || 0,
+            updates.discountType,
+            updates.adjustment || 0
+        );
+        updates.subTotal = totals.subTotal;
+        updates.totalAmount = totals.totalAmount;
+    }
     return await QuotationModel.updateQuotation(id, updates);
 };
 

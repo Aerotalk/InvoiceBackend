@@ -177,6 +177,13 @@ try {
     logger.error('❌ Failed to load Upload Routes:', error);
 }
 
+try {
+    app.use('/api/export', require('./routes/exportRoutes'));
+    logger.debug('📊 Export routes registered');
+} catch (error) {
+    logger.error('❌ Failed to load Export Routes:', error);
+}
+
 // Error Handler
 app.use(errorHandler);
 
