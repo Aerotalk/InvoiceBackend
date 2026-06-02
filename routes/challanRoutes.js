@@ -1,5 +1,7 @@
 const express = require('express');
 const router = express.Router();
+const { protect } = require('../middlewares/authMiddleware');
+const { validateChallan } = require('../validators/challanValidator');
 const { 
     createChallan, 
     getChallans, 
@@ -8,17 +10,18 @@ const {
     updateChallan,
     deleteChallan
 } = require('../controllers/challanController');
-const { protect } = require('../middlewares/authMiddleware');
 
+// Standard API Routes
 router.route('/')
-    .post(protect, createChallan)
+    .post(protect, validateChallan, createChallan)
     .get(protect, getChallans);
 
 router.route('/:id')
     .get(protect, getChallanById)
-    .put(protect, updateChallan)
+    .put(protect, validateChallan, updateChallan)
     .delete(protect, deleteChallan);
 
+// Generate/Download PDF 
 router.route('/:id/pdf')
     .get(protect, downloadChallanPdf);
 

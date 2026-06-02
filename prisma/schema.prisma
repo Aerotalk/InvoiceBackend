@@ -305,6 +305,11 @@ model Quotation {
   expiryDate      DateTime?
   salesperson     String?
   subject         String?
+  status          String    @default("draft")
+  
+  clientNameSnapshot    String?
+  clientCompanySnapshot String?
+  projectNameSnapshot   String?
   
   customerNotes   String?   @db.Text
   termsConditions String?   @db.Text
@@ -314,6 +319,8 @@ model Quotation {
   discountType    String?
   discountValue   Float?
   tdsTcs          String?
+  taxRate         Float?
+  taxAmount       Float?
   adjustment      Float?
   totalAmount     Float
   signatureUrl    String?
@@ -340,6 +347,7 @@ model QuotationItem {
   
   productId     String?
   product       Product?  @relation(fields: [productId], references: [id])
+  productNameSnapshot String?
   
   customDetails String?
   quantity      Float
@@ -375,6 +383,10 @@ model DeliveryChallan {
   referenceNumber String?
   challanDate     DateTime
   challanType     String?
+  status          String    @default("draft")
+  
+  clientNameSnapshot    String?
+  clientCompanySnapshot String?
   
   customerNotes   String?   @db.Text
   termsConditions String?   @db.Text
@@ -410,6 +422,7 @@ model DeliveryChallanItem {
   
   productId         String?
   product           Product?  @relation(fields: [productId], references: [id])
+  productNameSnapshot String?
   
   customDetails     String?
   quantity          Float

@@ -1,25 +1,21 @@
 const express = require('express');
-const router = express.Router();
-const { 
-    createQuotation, 
-    getQuotations, 
-    getQuotationById,
-    downloadQuotationPdf,
-    updateQuotation,
-    deleteQuotation
-} = require('../controllers/quotationController');
+const quotationController = require('../controllers/quotationController');
 const { protect } = require('../middlewares/authMiddleware');
+const validateRequest = require('../middlewares/validateRequest');
+const { quotationSchema } = require('../validators/quotationValidator');
+
+const router = express.Router();
+
+// All routes are protected
+router.use(protect);
 
 router.route('/')
-    .post(protect, createQuotation)
-    .get(protect, getQuotations);
+    .get(quotationController.getQuotations)
+    .post(validateRequest(quotationSchema), quotationController.createQuotation);
 
 router.route('/:id')
-    .get(protect, getQuotationById)
-    .put(protect, updateQuotation)
-    .delete(protect, deleteQuotation);
-
-router.route('/:id/pdf')
-    .get(protect, downloadQuotationPdf);
+    .get(quotationController.getQuotationById)
+    .put(validateRequest(quotationSchema), quotationController.updateQuotation)
+    .delete(quotationController.deleteQuotation);
 
 module.exports = router;
