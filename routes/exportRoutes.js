@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const { exportDataToExcel } = require('../controllers/exportController');
-const authMiddleware = require('../middlewares/authMiddleware');
+const { protect } = require('../middlewares/authMiddleware');
 
-router.use(authMiddleware);
+router.use(protect);
 
 router.get('/excel', exportDataToExcel);
 

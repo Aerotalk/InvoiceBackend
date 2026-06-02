@@ -16,7 +16,7 @@ const s3 = new S3Client({
 const storage = multerS3({
     s3: s3,
     bucket: process.env.S3_BUCKET,
-    // acl: 'public-read', // Let's avoid ACLs if bucket owner enforced, or uncomment if needed
+    acl: 'public-read',
     contentType: multerS3.AUTO_CONTENT_TYPE,
     key: function (req, file, cb) {
         // Read folder from body, defaults to 'misc'
