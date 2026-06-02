@@ -271,6 +271,9 @@ model Project {
   projectName String
   description String?   @db.Text
   status      String    @default("planning")
+  notes       String?   @db.Text
+  entities    Json?
+  invoices    Json?
   
   customerId  String
   customer    Customer  @relation(fields: [customerId], references: [id])
