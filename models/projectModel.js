@@ -3,7 +3,13 @@ const prisma = require('./index');
 const ProjectModel = {
     async createProject(data) {
         return prisma.project.create({ 
-            data
+            data,
+            include: {
+                customer: true,
+                vendors: {
+                    include: { vendor: true }
+                }
+            }
         });
     },
     async findProjectById(id) {
