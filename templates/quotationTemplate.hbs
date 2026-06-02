@@ -3,48 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <style>
-        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 10px; color: #333; margin: 0; padding: 0; }
-        .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
-        .logo { max-width: 200px; }
-        .company-details { text-align: right; font-size: 10px; line-height: 1.4; }
-        .company-name { font-size: 14px; font-weight: bold; margin-bottom: 5px; }
-        .title { text-align: center; font-size: 16px; font-weight: bold; color: #888; text-transform: uppercase; margin: 20px 0; border-bottom: 2px solid #ddd; padding-bottom: 5px; }
-        .info-section { display: flex; justify-content: space-between; margin-bottom: 20px; }
-        .info-col { width: 48%; line-height: 1.5; }
-        .info-col h3 { font-size: 12px; margin: 0 0 5px 0; color: #000; }
-        .table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-        .table th { background-color: #999; color: #fff; padding: 8px; text-align: left; font-size: 10px; }
-        .table td { padding: 8px; border-bottom: 1px solid #ddd; font-size: 10px; }
+        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 9px; color: #000; margin: 0; padding: 0; line-height: 1.3; }
+        .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; }
+        .logo { max-width: 180px; text-align: center; }
+        .company-details { text-align: right; font-size: 9px; line-height: 1.4; color: #333; }
+        .company-name { font-size: 11px; font-weight: bold; margin-bottom: 5px; color: #000; }
+        .title { text-align: center; font-size: 11px; font-weight: bold; color: #888; text-transform: none; margin: 15px 0; border-top: 1px solid #999; border-bottom: 1px solid #999; padding: 4px 0; background-color: #f9f9f9; }
+        .info-section { display: flex; justify-content: space-between; margin-bottom: 15px; }
+        .info-col { width: 48%; line-height: 1.4; color: #333; }
+        .info-col h3 { font-size: 10px; margin: 0 0 5px 0; color: #000; font-weight: bold; }
+        .table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
+        .table th { background-color: #999; color: #fff; padding: 6px; text-align: left; font-size: 9px; font-weight: bold; }
+        .table td { padding: 6px; border-bottom: 1px solid #ddd; font-size: 9px; vertical-align: top; }
         .text-right { text-align: right !important; }
-        .summary-section { display: flex; justify-content: flex-end; margin-bottom: 20px; }
-        .summary-table { width: 300px; border-collapse: collapse; }
-        .summary-table th { background-color: #999; color: #fff; padding: 5px; text-align: left; }
-        .summary-table td { padding: 5px; text-align: right; border-bottom: 1px solid #ddd; }
-        .summary-table .bold { font-weight: bold; }
-        .tax-table { width: 60%; border-collapse: collapse; margin-bottom: 20px; }
-        .tax-table th { background-color: #999; color: #fff; padding: 5px; text-align: left; }
+        .text-center { text-align: center !important; }
+        .summary-section { display: flex; justify-content: space-between; margin-bottom: 15px; }
+        .tax-table { width: 100%; border-collapse: collapse; }
+        .tax-table th { background-color: #999; color: #fff; padding: 5px; text-align: left; font-weight: bold; }
         .tax-table td { padding: 5px; border-bottom: 1px solid #ddd; }
-        .words-section { background-color: #999; color: #fff; padding: 5px; font-weight: bold; }
-        .words-text { padding: 5px; border-bottom: 1px solid #ddd; margin-bottom: 20px; }
-        .terms, .bank { background-color: #999; color: #fff; padding: 5px; font-weight: bold; margin-bottom: 5px; }
-        .footer-section { display: flex; justify-content: space-between; page-break-inside: avoid; }
-        .footer-col { width: 48%; font-size: 9px; line-height: 1.4; }
-        .signature { text-align: right; }
-        .signature img { max-width: 150px; margin-top: 10px; }
+        .summary-table { width: 100%; border-collapse: collapse; }
+        .summary-table th { background-color: #999; color: #fff; padding: 5px; text-align: left; font-weight: bold; }
+        .summary-table td { padding: 5px; border-bottom: 1px solid #ddd; }
+        .summary-table .bold { font-weight: bold; color: #000; }
+        .words-section { background-color: #999; color: #fff; padding: 5px; font-weight: bold; margin-top: 10px; display: inline-block; width: 100%; box-sizing: border-box; }
+        .words-text { padding: 5px 0; margin-bottom: 20px; }
+        .terms-title, .bank-title { background-color: #999; color: #fff; padding: 5px; font-weight: bold; margin-bottom: 5px; display: inline-block; width: 100%; box-sizing: border-box; }
+        .footer-section { display: flex; justify-content: space-between; page-break-inside: avoid; margin-top: 30px; }
+        .footer-col { width: 55%; font-size: 9px; line-height: 1.4; color: #333; }
+        .signature { width: 40%; text-align: right; }
+        .signature img { max-width: 120px; margin-top: 10px; }
+        .page-break { page-break-before: always; }
     </style>
 </head>
 <body>
     <div class="header">
         <div class="logo">
-            <!-- Hardcoded Logo -->
-            <h1 style="color: #E24A26; margin: 0;">Grivety <span style="color: #00A3E0;">Global</span></h1>
-            <span style="font-size: 8px; color: #00A3E0;">We are ready to help you...</span>
+            <div style="font-size: 24px; margin-bottom: 2px;">🌐</div>
+            <h1 style="color: #E24A26; margin: 0; font-size: 16px;">Grivety <span style="color: #00A3E0;">Global</span></h1>
+            <span style="font-size: 8px; color: #00A3E0; font-style: italic;">We are ready to help you...</span>
         </div>
         <div class="company-details">
             <div class="company-name">GRIVETY GLOBAL PRIVATE LIMITED</div>
-            <div>Disha Apartment, Flat No. 2, Ground Floor, DA-4/13,</div>
-            <div>Deshbandhu Nagar, Joramondir, Baguiati, VIP Road, Kolkata-700059</div>
-            <div>Phone no.: 033 40037666 Email: info@grivetyglobal.com</div>
+            <div>Disha apartment, Flat No. 2, Ground Floor, DA-4/13,</div>
+            <div>Deshbandhu Nagar, Joramondir, Baguiati, VIP Road, Kolkata-</div>
+            <div>700059</div>
+            <div style="margin-top: 3px;">Phone no.: 033 40037666 Email: info@grivetyglobal.com</div>
             <div>GSTIN: 19AAHCG8472G1Z6, State: 19-West Bengal</div>
             <div>PAN: AAHCG8472G</div>
         </div>
@@ -55,18 +58,21 @@
     <div class="info-section">
         <div class="info-col">
             <h3>Estimate For</h3>
-            <div style="font-weight: bold; font-size: 11px; margin-bottom: 5px;">{{customer.displayName}}</div>
+            <div style="font-weight: bold; font-size: 10px; margin-bottom: 4px; color: #000;">{{customer.displayName}}</div>
             {{#if customer.billingStreet1}}<div>{{customer.billingStreet1}}</div>{{/if}}
             {{#if customer.billingStreet2}}<div>{{customer.billingStreet2}}</div>{{/if}}
             <div>{{customer.billingCity}}{{#if customer.billingZipCode}}-{{customer.billingZipCode}}{{/if}}</div>
-            <div style="margin-top: 5px;">Contact No. : {{customer.workPhone}}</div>
+            <div style="margin-top: 4px;">Contact No. : {{customer.workPhone}}</div>
             <div>State: {{customer.billingState}}</div>
         </div>
         <div class="info-col text-right">
-            <h3>Estimate Details</h3>
+            <h3 class="text-right">Estimate Details</h3>
             <div>Estimate No. : {{quoteNumber}}</div>
             <div>Date : {{quoteDate}}</div>
             <div>Place of supply: {{customer.placeOfSupply}}</div>
+            <div>Name: {{salesperson}}</div>
+            <div>Email: {{salespersonEmail}}</div>
+            <div>Mobile: {{salespersonMobile}}</div>
             <div>Valid till: {{expiryDate}}</div>
         </div>
     </div>
@@ -74,116 +80,125 @@
     <table class="table">
         <thead>
             <tr>
-                <th>#</th>
-                <th>Item name</th>
-                <th>HSN/SAC</th>
-                <th class="text-right">Quantity</th>
-                <th>Unit</th>
-                <th class="text-right">Price/ Unit</th>
-                <th class="text-right">Taxable amount</th>
-                <th class="text-right">GST</th>
-                <th class="text-right">Amount</th>
+                <th style="width: 3%;">#</th>
+                <th style="width: 32%;">Item name</th>
+                <th class="text-center" style="width: 10%;">HSN/SAC</th>
+                <th class="text-center" style="width: 8%;">Quantity</th>
+                <th class="text-center" style="width: 7%;">Unit</th>
+                <th class="text-right" style="width: 10%;">Price/ Unit</th>
+                <th class="text-right" style="width: 12%;">Taxable amount</th>
+                <th class="text-center" style="width: 8%;">GST</th>
+                <th class="text-right" style="width: 10%;">Amount</th>
             </tr>
         </thead>
         <tbody>
             {{#each items}}
             <tr>
-                <td style="vertical-align: top;">{{this.index}}</td>
-                <td style="vertical-align: top;">
-                    <strong>{{this.name}}</strong>
+                <td>{{this.index}}</td>
+                <td>
+                    <strong style="color: #000;">{{this.name}}</strong>
                     {{#if this.description}}
-                    <div style="font-size: 8.5px; color: #555; margin-top: 3px; white-space: pre-wrap;">{{this.description}}</div>
+                    <div style="font-size: 8px; color: #555; margin-top: 2px; white-space: pre-wrap;">{{this.description}}</div>
                     {{/if}}
                 </td>
-                <td style="vertical-align: top;">{{this.hsn}}</td>
-                <td class="text-right" style="vertical-align: top;">{{this.quantity}}</td>
-                <td style="vertical-align: top;">{{this.unit}}</td>
-                <td class="text-right" style="vertical-align: top;">₹ {{this.rate}}</td>
-                <td class="text-right" style="vertical-align: top;">₹ {{this.taxableAmount}}</td>
-                <td class="text-right" style="vertical-align: top;">{{this.tax}}</td>
-                <td class="text-right" style="vertical-align: top;">₹ {{this.amount}}</td>
+                <td class="text-center">{{this.hsn}}</td>
+                <td class="text-center">{{this.quantity}}</td>
+                <td class="text-center">{{this.unit}}</td>
+                <td class="text-right">₹ {{this.rate}}</td>
+                <td class="text-right">₹ {{this.taxableAmount}}</td>
+                <td class="text-center" style="line-height: 1.1;">
+                    ₹ {{this.taxAmount}}<br>
+                    <span style="font-size: 7.5px;">[{{this.tax}}%]</span>
+                </td>
+                <td class="text-right">₹ {{this.amount}}</td>
             </tr>
             {{/each}}
-            <tr>
-                <td colspan="3"><strong>Total</strong></td>
-                <td class="text-right"><strong>{{totalQuantity}}</strong></td>
+            <tr style="border-top: 1px solid #000; border-bottom: 1px solid #000;">
+                <td colspan="3"><strong style="color: #000;">Total</strong></td>
+                <td class="text-center"><strong style="color: #000;">{{totalQuantity}}</strong></td>
                 <td colspan="2"></td>
-                <td class="text-right"><strong>₹ {{subTotal}}</strong></td>
-                <td class="text-right"><strong>₹ {{totalTax}}</strong></td>
-                <td class="text-right"><strong>₹ {{totalAmount}}</strong></td>
+                <td class="text-right"><strong style="color: #000;">₹ {{subTotal}}</strong></td>
+                <td class="text-center"><strong style="color: #000;">₹ {{totalTax}}</strong></td>
+                <td class="text-right"><strong style="color: #000;">₹ {{totalAmount}}</strong></td>
             </tr>
         </tbody>
     </table>
 
-    <div style="display: flex; justify-content: space-between;">
-        <table class="tax-table">
-            <thead>
-                <tr>
-                    <th>Tax type</th>
-                    <th class="text-right">Taxable amount</th>
-                    <th class="text-right">Rate</th>
-                    <th class="text-right">Tax amount</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>SGST</td>
-                    <td class="text-right">₹ {{subTotal}}</td>
-                    <td class="text-right">9%</td>
-                    <td class="text-right">₹ {{sgst}}</td>
-                </tr>
-                <tr>
-                    <td>CGST</td>
-                    <td class="text-right">₹ {{subTotal}}</td>
-                    <td class="text-right">9%</td>
-                    <td class="text-right">₹ {{cgst}}</td>
-                </tr>
-            </tbody>
-        </table>
+    <div class="summary-section">
+        <div style="width: 62%;">
+            <table class="tax-table">
+                <thead>
+                    <tr>
+                        <th>Tax type</th>
+                        <th class="text-right">Taxable amount</th>
+                        <th class="text-right">Rate</th>
+                        <th class="text-right">Tax amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>SGST</td>
+                        <td class="text-right">₹ {{subTotal}}</td>
+                        <td class="text-right">9%</td>
+                        <td class="text-right">₹ {{sgst}}</td>
+                    </tr>
+                    <tr>
+                        <td>CGST</td>
+                        <td class="text-right">₹ {{subTotal}}</td>
+                        <td class="text-right">9%</td>
+                        <td class="text-right">₹ {{cgst}}</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="words-section">Estimate Amount In Words</div>
+            <div class="words-text">{{totalAmountInWords}}</div>
+        </div>
 
-        <table class="summary-table">
-            <thead>
-                <tr>
-                    <th colspan="2">Amounts</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Sub Total</td>
-                    <td class="bold">₹ {{subTotal}}</td>
-                </tr>
-                <tr>
-                    <td class="bold">Total</td>
-                    <td class="bold">₹ {{totalAmount}}</td>
-                </tr>
-            </tbody>
-        </table>
+        <div style="width: 35%;">
+            <table class="summary-table">
+                <thead>
+                    <tr>
+                        <th colspan="2">Amounts</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Sub Total</td>
+                        <td class="text-right">₹ {{subTotal}}</td>
+                    </tr>
+                    <tr>
+                        <td class="bold">Total</td>
+                        <td class="text-right bold">₹ {{totalAmount}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 
-    <div class="words-section">Estimate Amount In Words</div>
-    <div class="words-text">{{totalAmountInWords}}</div>
-
-    <div class="footer-section">
-        <div class="footer-col">
-            <div class="terms">Terms and Conditions</div>
-            <div style="white-space: pre-wrap;">{{termsConditions}}</div>
-            
-            <div class="bank" style="margin-top: 20px;">Bank Details</div>
-            <div>Name : Axis Bank Ltd</div>
-            <div>Account No. : 926020010304892</div>
-            <div>IFSC code : UTIB0005408</div>
-            <div>Account holder's name : GRIVETY GLOBAL PRIVATE LIMITED</div>
-        </div>
-        <div class="footer-col signature">
-            <div style="margin-top: 40px;">For : GRIVETY GLOBAL PRIVATE LIMITED</div>
-            {{#if signatureUrl}}
-            <div style="margin-top: 10px;">
-                <img src="{{signatureUrl}}" alt="Signature" style="max-height: 50px; max-width: 150px; object-fit: contain;">
+    <div style="page-break-inside: avoid;">
+        <div class="footer-section">
+            <div class="footer-col">
+                <div class="terms-title">Terms and Conditions</div>
+                <div style="white-space: pre-wrap; margin-bottom: 10px;">{{termsConditions}}</div>
+                
+                <div class="bank-title">Bank Details</div>
+                <div>Name : Axis Bank Ltd</div>
+                <div>Account No. : 926020010304892</div>
+                <div>IFSC code : UTIB0005408</div>
+                <div>Account holder's name : GRIVETY GLOBAL PRIVATE LIMITED</div>
             </div>
-            {{else}}
-            <div style="margin-top: 50px; border-bottom: 1px solid #000; width: 150px; display: inline-block;"></div>
-            {{/if}}
-            <div style="margin-top: 10px; font-weight: bold;">Authorized Signatory</div>
+            <div class="footer-col signature">
+                <div style="margin-top: 15px; color: #000;">for : GRIVETY GLOBAL PRIVATE LIMITED</div>
+                {{#if signatureUrl}}
+                <div style="margin-top: 10px;">
+                    <img src="{{signatureUrl}}" alt="Signature">
+                </div>
+                {{else}}
+                <div style="margin-top: 40px; border-bottom: 1px solid #000; width: 120px; margin-left: auto;"></div>
+                {{/if}}
+                <div style="margin-top: 5px; font-weight: bold; color: #000;">Authorized Signatory</div>
+            </div>
         </div>
     </div>
 </body>

@@ -169,10 +169,90 @@ const deleteQuotation = async (userId, id) => {
     return { message: "Quotation deleted successfully" };
 };
 
+const generatePdf = async (userId, id) => {
+    const quotation = await getQuotationById(userId, id);
+    const path = require('path');
+    const fs = require('fs');
+    const handlebars = require('handlebars');
+    
+    const templatePath = path.join(__dirname, '../templates/quotationTemplate.hbs');
+    if (!fs.existsSync(templatePath)) {
+        throw new AppError('Template not found', 500);
+    }
+    const templateHtml = fs.readFileSync(templatePath, 'utf8');
+    const template = handlebars.compile(templateHtml);
+    
+    // Prepare data
+    const totalQuantity = quotation.items.reduce((sum, item) => sum + item.quantity, 0);
+    const totalTax = quotation.taxAmount || 0;
+    
+    // Number to words converter (simple version or rely on a library if one is installed, but since we just need something basic we'll pass the exact amount as string)
+    // The previous template expected totalAmountInWords.
+    const toWords = require('number-to-words');
+    const amountInWords = (toWords.toWords(quotation.totalAmount) + ' rupees only').replace(/(^\w|\s\w)/g, m => m.toUpperCase());
+    
+    const data = {
+        quoteNumber: quotation.quoteNumber,
+        quoteDate: quotation.quoteDate.toLocaleDateString('en-GB'),
+        expiryDate: quotation.expiryDate ? quotation.expiryDate.toLocaleDateString('en-GB') : '',
+        customer: quotation.customer,
+        clientCompanySnapshot: quotation.clientCompanySnapshot,
+        clientNameSnapshot: quotation.clientNameSnapshot,
+        salesperson: quotation.salesperson,
+        salespersonEmail: '',
+        salespersonMobile: '',
+        items: quotation.items.map((item, index) => ({
+            index: index + 1,
+            name: item.productNameSnapshot || 'Custom Item',
+            description: '',
+            hsn: '',
+            quantity: item.quantity,
+            unit: 'Nos',
+            rate: item.rate.toFixed(2),
+            taxableAmount: (item.quantity * item.rate).toFixed(2),
+            tax: quotation.taxRate || 18,
+            taxAmount: ((item.quantity * item.rate) * (quotation.taxRate || 18) / 100).toFixed(2),
+            amount: item.amount.toFixed(2)
+        })),
+        totalQuantity,
+        subTotal: quotation.subTotal.toFixed(2),
+        totalTax: Number(totalTax).toFixed(2),
+        sgst: (Number(totalTax) / 2).toFixed(2),
+        cgst: (Number(totalTax) / 2).toFixed(2),
+        totalAmount: quotation.totalAmount.toFixed(2),
+        totalAmountInWords: amountInWords,
+        termsConditions: quotation.termsConditions || '1. Validity of Quotation...\n2. Pricing...',
+        customerNotes: quotation.customerNotes,
+        signatureUrl: quotation.signatureUrl
+    };
+
+    const finalHtml = template(data);
+
+    const puppeteerModule = await import('puppeteer');
+    const puppeteer = puppeteerModule.default || puppeteerModule;
+
+    const browser = await puppeteer.launch({
+        headless: "new",
+        executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || puppeteer.executablePath(),
+        args: ['--no-sandbox', '--disable-setuid-sandbox']
+    });
+    const page = await browser.newPage();
+    await page.setContent(finalHtml, { waitUntil: 'load' });
+    const pdfBuffer = await page.pdf({
+        format: 'A4',
+        printBackground: true,
+        margin: { top: '30px', right: '30px', bottom: '30px', left: '30px' }
+    });
+    
+    await browser.close();
+    return pdfBuffer;
+};
+
 module.exports = {
     createQuotation,
     getQuotations,
     getQuotationById,
     updateQuotation,
-    deleteQuotation
+    deleteQuotation,
+    generatePdf
 };

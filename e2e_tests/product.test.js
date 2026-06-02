@@ -142,4 +142,120 @@ describe('Product API E2E Tests', () => {
       ])
     );
   });
+
+  it('should update an existing product', async () => {
+    // Create a product first
+    const prod = await prisma.product.create({
+      data: {
+        userId,
+        name: 'Server Rack v1',
+        type: 'GOODS',
+        unit: 'Unit',
+        taxPreference: 'TAXABLE',
+        sellingPrice: 8000,
+        intraStateTaxRate: 'GST18 [18%]',
+        interStateTaxRate: 'IGST18 [18%]'
+      }
+    });
+
+    const updatePayload = {
+      name: 'Server Rack v2',
+      type: 'goods',
+      unit: 'Rack',
+      taxPreference: 'Taxable',
+      sellingPrice: 9500,
+      intraStateTaxRate: 'GST12 [12%]',
+      interStateTaxRate: 'IGST12 [12%]',
+      description: 'Upgraded heavy duty server rack'
+    };
+
+    const res = await request(app)
+      .put(`/api/products/${prod.id}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send(updatePayload);
+
+    expect(res.statusCode).toEqual(200);
+    expect(res.body.success).toBe(true);
+    expect(res.body.data.name).toEqual('Server Rack v2');
+    expect(res.body.data.unit).toEqual('Rack');
+    expect(res.body.data.sellingPrice).toEqual(9500);
+    expect(res.body.data.description).toEqual('Upgraded heavy duty server rack');
+    expect(res.body.data.intraStateTaxRate).toEqual('GST12 [12%]');
+  });
+
+  it('should fail to update with validation errors', async () => {
+    const prod = await prisma.product.create({
+      data: {
+        userId,
+        name: 'Temp Product',
+        type: 'GOODS',
+        unit: 'Unit',
+        taxPreference: 'TAXABLE',
+        sellingPrice: 100
+      }
+    });
+
+    const updatePayload = {
+      name: 'Temp Product',
+      type: 'goods',
+      unit: '', // empty unit is invalid
+      taxPreference: 'Taxable',
+      sellingPrice: -50 // negative price is invalid
+    };
+
+    const res = await request(app)
+      .put(`/api/products/${prod.id}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send(updatePayload);
+
+    expect(res.statusCode).toEqual(400);
+    expect(res.body.errors).toBeDefined();
+  });
+
+  it('should return 404 when updating non-existent product', async () => {
+    const fakeId = '00000000-0000-0000-0000-000000000000';
+    const updatePayload = {
+      name: 'Non Existent Server',
+      type: 'goods',
+      unit: 'Server',
+      taxPreference: 'Taxable',
+      sellingPrice: 20000
+    };
+
+    const res = await request(app)
+      .put(`/api/products/${fakeId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send(updatePayload);
+
+    expect(res.statusCode).toEqual(404);
+  });
+
+  it('should delete an existing product', async () => {
+    // Create a product first
+    const prod = await prisma.product.create({
+      data: {
+        userId,
+        name: 'Product to Delete',
+        type: 'GOODS',
+        unit: 'Unit',
+        taxPreference: 'TAXABLE',
+        sellingPrice: 1000
+      }
+    });
+
+    // Delete the product
+    const deleteRes = await request(app)
+      .delete(`/api/products/${prod.id}`)
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(deleteRes.statusCode).toEqual(200);
+    expect(deleteRes.body.success).toBe(true);
+
+    // Verify it is gone
+    const fetchRes = await request(app)
+      .get(`/api/products/${prod.id}`)
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(fetchRes.statusCode).toEqual(404);
+  });
 });

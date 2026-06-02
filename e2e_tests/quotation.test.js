@@ -61,10 +61,12 @@ beforeAll(async () => {
 afterAll(async () => {
   if (testUser) {
     await prisma.quotation.deleteMany({ where: { userId: testUser.id } });
-    await prisma.user.delete({ where: { id: testUser.id } });
   }
   if (testClient) {
     await prisma.customer.deleteMany({ where: { id: testClient.id } });
+  }
+  if (testUser) {
+    await prisma.user.delete({ where: { id: testUser.id } });
   }
 });
 

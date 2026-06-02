@@ -18,4 +18,7 @@ router.route('/:id')
     .put(validateRequest(quotationSchema), quotationController.updateQuotation)
     .delete(quotationController.deleteQuotation);
 
+router.route('/:id/pdf')
+    .get(quotationController.generatePdf);
+
 module.exports = router;

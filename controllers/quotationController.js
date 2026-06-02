@@ -53,10 +53,24 @@ const deleteQuotation = asyncHandler(async (req, res, next) => {
     });
 });
 
+const generatePdf = asyncHandler(async (req, res, next) => {
+    const userId = req.user.id;
+    const pdfBuffer = await quotationService.generatePdf(userId, req.params.id);
+    
+    const quotation = await quotationService.getQuotationById(userId, req.params.id);
+    
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `inline; filename=${quotation.quoteNumber}.pdf`);
+    res.setHeader('Content-Length', pdfBuffer.length);
+    
+    res.status(200).send(pdfBuffer);
+});
+
 module.exports = {
     createQuotation,
     getQuotations,
     getQuotationById,
     updateQuotation,
-    deleteQuotation
+    deleteQuotation,
+    generatePdf
 };
