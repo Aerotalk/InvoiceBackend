@@ -8,17 +8,16 @@ const uploadFile = asyncHandler(async (req, res, next) => {
         throw new AppError('No file uploaded', 400);
     }
 
-    const protocol = req.protocol;
-    const host = req.get('host');
-    const fileUrl = `${protocol}://${host}/uploads/${req.file.filename}`;
+    // req.file.location is populated by multer-s3
+    const fileUrl = req.file.location;
 
-    logger.info(`✅ File uploaded successfully: ${req.file.filename}`);
+    logger.info(`✅ File uploaded successfully to S3: ${fileUrl}`);
     
     res.status(200).json({ 
         success: true, 
         data: {
             url: fileUrl,
-            filename: req.file.filename,
+            filename: req.file.key || req.file.filename,
             mimetype: req.file.mimetype
         }
     });

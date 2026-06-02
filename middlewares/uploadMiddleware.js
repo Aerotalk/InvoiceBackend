@@ -1,18 +1,27 @@
 const multer = require('multer');
+const multerS3 = require('multer-s3');
+const { S3Client } = require('@aws-sdk/client-s3');
 const path = require('path');
-const fs = require('fs');
 
-const uploadDir = path.join(__dirname, '../uploads');
-if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true });
-}
+const s3 = new S3Client({
+    endpoint: process.env.S3_ENDPOINT,
+    region: process.env.S3_REGION,
+    credentials: {
+        accessKeyId: process.env.S3_ACCESS_KEY_ID,
+        secretAccessKey: process.env.S3_SECRET_ACCESS_KEY
+    }
+});
 
-const storage = multer.diskStorage({
-    destination(req, file, cb) {
-        cb(null, 'uploads/');
-    },
-    filename(req, file, cb) {
-        cb(null, `${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`);
+const storage = multerS3({
+    s3: s3,
+    bucket: process.env.S3_BUCKET,
+    // acl: 'public-read', // Let's avoid ACLs if bucket owner enforced, or uncomment if needed
+    contentType: multerS3.AUTO_CONTENT_TYPE,
+    key: function (req, file, cb) {
+        // Read folder from body, defaults to 'misc'
+        const folder = req.body.folder || 'misc';
+        const filename = `${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`;
+        cb(null, `${folder}/${filename}`);
     }
 });
 
