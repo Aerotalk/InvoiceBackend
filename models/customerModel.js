@@ -11,7 +11,11 @@ const CustomerModel = {
             where: { id },
             include: {
                 contactPersons: true,
-                customFields: true
+                customFields: true,
+                projects: true,
+                quotations: true,
+                deliveryChallans: true,
+                expenses: true
             }
         });
     },
@@ -32,7 +36,11 @@ const CustomerModel = {
     async findAllCustomers(userId) {
         const whereClause = userId ? { userId } : {};
         return prisma.customer.findMany({ 
-            where: whereClause
+            where: whereClause,
+            include: {
+                projects: true,
+                quotations: true
+            }
         });
     }
 };

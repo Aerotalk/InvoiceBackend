@@ -1,7 +1,7 @@
 const { z } = require('zod');
 
 // Schema matching the frontend requirements
-const customerSchema = z.object({
+const baseCustomerSchema = z.object({
   clientType: z.enum(['individual', 'business']),
   name: z.string().optional(),
   displayName: z.string().min(2, { message: "Display name must be at least 2 characters" }),
@@ -80,7 +80,9 @@ const customerSchema = z.object({
   })).optional(),
   
   documentsCount: z.number().optional()
-}).superRefine((data, ctx) => {
+});
+
+const customerSchema = baseCustomerSchema.superRefine((data, ctx) => {
   // If registered business, gstNumber is required
   const isNotRegisteredBusiness = ['Overseas', 'Consumer', 'Unregistered Business', ''].includes(data.gstTreatment);
   if (!isNotRegisteredBusiness && !data.gstNumber) {
@@ -101,6 +103,9 @@ const customerSchema = z.object({
   }
 });
 
+const updateCustomerSchema = baseCustomerSchema.partial();
+
 module.exports = {
-  customerSchema
+  customerSchema,
+  updateCustomerSchema
 };

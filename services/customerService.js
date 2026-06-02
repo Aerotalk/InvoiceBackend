@@ -92,8 +92,18 @@ const getCustomerById = async (id) => {
     return customer;
 };
 
+const updateCustomer = async (id, data) => {
+    // Determine which fields to update
+    const updateData = {};
+    if (data.notes !== undefined) updateData.internalRemarks = data.notes;
+    // Add other fields as needed if the frontend sends them later
+    
+    return await CustomerModel.updateCustomer(id, updateData);
+};
+
 module.exports = {
     createCustomer,
     getCustomersByUser,
-    getCustomerById
+    getCustomerById,
+    updateCustomer
 };

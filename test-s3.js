@@ -1,9 +1,10 @@
+const { S3Client, GetObjectCommand } = require("@aws-sdk/client-s3");
+const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
 require('dotenv').config();
-const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
 
 const s3 = new S3Client({
     endpoint: process.env.S3_ENDPOINT,
-    region: 'us-east-1',
+    region: process.env.S3_REGION === 'auto' ? 'us-east-1' : process.env.S3_REGION,
     credentials: {
         accessKeyId: process.env.S3_ACCESS_KEY_ID,
         secretAccessKey: process.env.S3_SECRET_ACCESS_KEY
@@ -11,19 +12,17 @@ const s3 = new S3Client({
     forcePathStyle: true
 });
 
-async function testUpload() {
+async function testSign() {
     try {
-        const command = new PutObjectCommand({
+        const command = new GetObjectCommand({
             Bucket: process.env.S3_BUCKET,
-            Key: "test/test-file.txt",
-            Body: "test",
-            ContentType: "text/plain"
+            Key: "AVATAR/file-123.jpg" // Dummy key
         });
-        const response = await s3.send(command);
-        console.log("Upload successful:", response.$metadata.httpStatusCode);
-    } catch (err) {
-        console.error("Upload failed:");
-        console.error(err);
+        
+        const signedUrl = await getSignedUrl(s3, command, { expiresIn: 3600 });
+        console.log("Signed URL:", signedUrl);
+    } catch (e) {
+        console.error("Error signing URL:", e);
     }
 }
-testUpload();
+testSign();

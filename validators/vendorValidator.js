@@ -1,7 +1,7 @@
 const { z } = require('zod');
 
 // Schema matching the frontend requirements for Vendor
-const vendorSchema = z.object({
+const baseVendorSchema = z.object({
   vendorType: z.enum(['individual', 'business']),
   name: z.string().optional(),
   displayName: z.string().min(2, { message: "Display name must be at least 2 characters" }),
@@ -75,7 +75,9 @@ const vendorSchema = z.object({
   })).optional(),
   
   documentsCount: z.number().optional()
-}).superRefine((data, ctx) => {
+});
+
+const vendorSchema = baseVendorSchema.superRefine((data, ctx) => {
   // If registered business, gstNumber is required
   const isNotRegisteredBusiness = ['Overseas', 'Consumer', 'Unregistered Business', ''].includes(data.gstTreatment);
   if (!isNotRegisteredBusiness && !data.gstNumber) {
@@ -96,6 +98,9 @@ const vendorSchema = z.object({
   }
 });
 
+const updateVendorSchema = baseVendorSchema.partial();
+
 module.exports = {
-  vendorSchema
+  vendorSchema,
+  updateVendorSchema
 };

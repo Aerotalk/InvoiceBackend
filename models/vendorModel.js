@@ -11,7 +11,9 @@ const VendorModel = {
             where: { id },
             include: {
                 contactPersons: true,
-                customFields: true
+                customFields: true,
+                expenses: true,
+                projectVendors: true
             }
         });
     },
@@ -32,7 +34,10 @@ const VendorModel = {
     async findAllVendors(userId) {
         const whereClause = userId ? { userId } : {};
         return prisma.vendor.findMany({ 
-            where: whereClause
+            where: whereClause,
+            include: {
+                expenses: true
+            }
         });
     }
 };

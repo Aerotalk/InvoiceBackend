@@ -31,8 +31,25 @@ const getCustomerById = asyncHandler(async (req, res, next) => {
     res.status(200).json({ success: true, data: customer });
 });
 
+const updateCustomer = asyncHandler(async (req, res, next) => {
+    logger.info(`📝 Updating customer ${req.params.id}...`);
+
+    const customer = await customerService.getCustomerById(req.params.id);
+
+    if (customer.userId !== req.user.id) {
+        logger.warn(`🛑 Unauthorized update attempt for customer ${req.params.id} by user ${req.user.id} 🔒`);
+        throw new AppError('Not authorized to update this customer', 403);
+    }
+
+    const updatedCustomer = await customerService.updateCustomer(req.params.id, req.body);
+    
+    logger.info(`✅ Successfully updated customer details for ${updatedCustomer.displayName} 📈`);
+    res.status(200).json({ success: true, data: updatedCustomer });
+});
+
 module.exports = {
     createCustomer,
     getCustomers,
-    getCustomerById
+    getCustomerById,
+    updateCustomer
 };
