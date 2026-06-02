@@ -131,26 +131,49 @@ const generatePdf = async (id) => {
     const templateHtml = fs.readFileSync(templatePath, 'utf8');
     const template = handlebars.compile(templateHtml);
     
-    const data = {
-        challanNumber: challan.challanNumber,
-        referenceNumber: challan.referenceNumber,
-        challanDate: challan.challanDate.toLocaleDateString('en-GB'),
-        customer: challan.customer,
-        clientCompanySnapshot: challan.clientCompanySnapshot,
-        clientNameSnapshot: challan.clientNameSnapshot,
-        items: challan.items.map((item, index) => ({
-            index: index + 1,
-            name: item.productNameSnapshot || (item.product ? item.product.name : 'Custom Item'),
-            quantity: item.quantity,
-            rate: item.rate.toFixed(2),
-            amount: item.amount.toFixed(2)
-        })),
-        subTotal: challan.subTotal.toFixed(2),
-        totalAmount: challan.totalAmount.toFixed(2),
-        termsConditions: challan.termsConditions,
-        customerNotes: challan.customerNotes,
-        signatureUrl: challan.signatureUrl
-    };
+    const logoBase64 = require('../utils/logoBase64');
+    
+        const toWords = require('number-to-words');
+        const totalAmountInWords = (toWords.toWords(challan.totalAmount) + ' rupees only').replace(/(^\w|\s\w)/g, m => m.toUpperCase());
+
+        let totalQuantity = 0;
+        let totalTax = 0;
+
+        const data = {
+            logoUrl: `data:image/png;base64,${logoBase64}`,
+            challanNumber: challan.challanNumber,
+            referenceNumber: challan.referenceNumber,
+            challanDate: challan.challanDate.toLocaleDateString('en-GB'),
+            customer: challan.customer,
+            clientCompanySnapshot: challan.clientCompanySnapshot,
+            clientNameSnapshot: challan.clientNameSnapshot,
+            items: challan.items.map((item, index) => {
+                totalQuantity += item.quantity;
+                totalTax += item.taxAmount;
+                const taxableAmount = item.amount - item.taxAmount;
+                return {
+                    index: index + 1,
+                    name: item.productNameSnapshot || (item.product ? item.product.name : 'Custom Item'),
+                    hsn: item.product ? item.product.hsn : '',
+                    unit: item.product ? item.product.unit : 'pcs',
+                    quantity: item.quantity,
+                    rate: item.rate.toFixed(2),
+                    taxableAmount: taxableAmount.toFixed(2),
+                    tax: item.tax ? `${item.tax}%` : '18%',
+                    amount: item.amount.toFixed(2)
+                };
+            }),
+            totalQuantity: totalQuantity,
+            totalTax: totalTax.toFixed(2),
+            sgst: (totalTax / 2).toFixed(2),
+            cgst: (totalTax / 2).toFixed(2),
+            subTotal: challan.subTotal.toFixed(2),
+            totalAmount: challan.totalAmount.toFixed(2),
+            totalAmountInWords: totalAmountInWords,
+            termsConditions: challan.termsConditions,
+            customerNotes: challan.customerNotes,
+            signatureUrl: challan.signatureUrl
+        };
 
     const finalHtml = template(data);
 

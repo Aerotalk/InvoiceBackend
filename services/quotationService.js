@@ -190,8 +190,10 @@ const generatePdf = async (userId, id) => {
     // The previous template expected totalAmountInWords.
     const toWords = require('number-to-words');
     const amountInWords = (toWords.toWords(quotation.totalAmount) + ' rupees only').replace(/(^\w|\s\w)/g, m => m.toUpperCase());
+    const logoBase64 = require('../utils/logoBase64');
     
     const data = {
+        logoUrl: `data:image/png;base64,${logoBase64}`,
         quoteNumber: quotation.quoteNumber,
         quoteDate: quotation.quoteDate.toLocaleDateString('en-GB'),
         expiryDate: quotation.expiryDate ? quotation.expiryDate.toLocaleDateString('en-GB') : '',
