@@ -20,6 +20,7 @@ const createCustomer = async (data) => {
         mobilePhone: data.mobile || null,
         currency: data.currency || 'INR',
         gstTreatment: data.gstTreatment || null,
+        gstNumber: data.gstNumber || null,
         pan: data.pan || null,
         paymentTerms: data.paymentTerms || null,
         placeOfSupply: data.placeOfSupply || null,
@@ -31,7 +32,9 @@ const createCustomer = async (data) => {
         xProfileLink: data.socialX || null,
         facebookPage: data.socialFacebook || null,
         allowPortalAccess: data.enablePortal || false,
-        documentsAttachment: data.avatar || null, // Using avatar URL for now
+        documentsAttachment: null,
+        avatarUrl: data.avatar || null,
+        status: data.status || 'active',
 
         // Billing
         billingAttention: data.billingAddress?.attention || null,
@@ -63,8 +66,8 @@ const createCustomer = async (data) => {
                 salutation: cp.salutation || '',
                 firstName: cp.firstName || '',
                 lastName: cp.lastName || '',
-                email: cp.email || ''
-                // Note: Prisma schema does not have a 'phone' field for CustomerContactPerson
+                email: cp.email || '',
+                phone: cp.phone || null
             }))
         } : undefined,
 

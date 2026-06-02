@@ -64,6 +64,7 @@ model Customer {
   mobilePhone             String?
   currency                String
   gstTreatment            String?
+  gstNumber               String?
   pan                     String?
   paymentTerms            String?
   placeOfSupply           String?
@@ -76,6 +77,8 @@ model Customer {
   facebookPage            String?
   allowPortalAccess       Boolean       @default(false)
   documentsAttachment     String?
+  avatarUrl               String?
+  status                  String        @default("active")
 
   // Address Mapping - Billing
   billingAttention        String?
@@ -122,6 +125,7 @@ model CustomerContactPerson {
   firstName  String
   lastName   String
   email      String
+  phone      String?
   
   customerId String
   customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)

@@ -61,7 +61,10 @@ const registerUser = async (data) => {
             email: user.email,
             accountType: user.accountType,
             fullName: user.fullName,
-            companyName: user.companyName
+            companyName: user.companyName,
+            avatar: user.settings?.profileAvatarUrl || "",
+            logos: user.settings?.brandLogoUrls || [],
+            addresses: user.settings?.billingAddresses || []
         }
     };
 };
@@ -87,7 +90,10 @@ const loginUser = async (email, password) => {
             email: user.email,
             accountType: user.accountType,
             fullName: user.fullName,
-            companyName: user.companyName
+            companyName: user.companyName,
+            avatar: user.settings?.profileAvatarUrl || "",
+            logos: user.settings?.brandLogoUrls || [],
+            addresses: user.settings?.billingAddresses || []
         }
       };
     } else {
