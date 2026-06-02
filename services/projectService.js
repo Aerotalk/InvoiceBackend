@@ -30,6 +30,8 @@ const createProject = async (data) => {
 
     const prismaCreateData = {
         projectName,
+        description: data.description || null,
+        status: data.status || 'planning',
         customerId,
         budget,
         currency: data.currency || 'INR',

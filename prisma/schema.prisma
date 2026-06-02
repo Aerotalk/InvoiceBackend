@@ -269,6 +269,8 @@ model Product {
 model Project {
   id          String    @id @default(uuid())
   projectName String
+  description String?   @db.Text
+  status      String    @default("planning")
   
   customerId  String
   customer    Customer  @relation(fields: [customerId], references: [id])
