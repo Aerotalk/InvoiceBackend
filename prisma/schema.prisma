@@ -46,6 +46,9 @@ enum CustomerType {
 enum TaxPreference {
   TAXABLE
   TAX_EXEMPT
+  NON_TAXABLE
+  OUT_OF_SCOPE
+  NON_GST_SUPPLY
 }
 
 model Customer {
@@ -170,6 +173,10 @@ model Vendor {
   facebookPage            String?
   allowPortalAccess       Boolean       @default(false)
   documentsAttachment     String?
+  
+  gstTreatment            String?
+  gstNumber               String?
+  status                  String?       @default("active")
 
   // Address Mapping - Billing
   billingAttention        String?
@@ -214,6 +221,7 @@ model VendorContactPerson {
   firstName  String
   lastName   String
   email      String
+  phone      String?
   
   vendorId   String
   vendor     Vendor   @relation(fields: [vendorId], references: [id], onDelete: Cascade)

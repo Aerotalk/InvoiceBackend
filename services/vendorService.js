@@ -35,6 +35,9 @@ const createVendor = async (data) => {
         facebookPage: data.socialFacebook || null,
         allowPortalAccess: data.enablePortal || false,
         documentsAttachment: data.avatar || null,
+        gstTreatment: data.gstTreatment || null,
+        gstNumber: data.gstNumber || null,
+        status: data.status || 'active',
 
         // Billing
         billingAttention: data.billingAddress?.attention || null,
@@ -66,7 +69,8 @@ const createVendor = async (data) => {
                 salutation: cp.salutation || '',
                 firstName: cp.firstName || '',
                 lastName: cp.lastName || '',
-                email: cp.email || ''
+                email: cp.email || '',
+                phone: cp.phone || null
             }))
         } : undefined,
 

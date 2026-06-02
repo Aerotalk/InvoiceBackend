@@ -1,44 +1,119 @@
-const ProductModel = require('../models/productModel');
+const prisma = require('../models/index');
+const AppError = require('../utils/AppError');
 
-const createProduct = async (data) => {
-    if (!data.name || data.sellingPrice === undefined || !data.userId) {
-        throw new Error('Name, Selling Price, and User ID are required');
+// Helper to map frontend TaxPreference string to Prisma Enum
+const mapTaxPreference = (taxPref) => {
+    switch (taxPref) {
+        case 'Taxable': return 'TAXABLE';
+        case 'Tax Exempt': return 'TAX_EXEMPT';
+        case 'Non-Taxable': return 'NON_TAXABLE';
+        case 'Out of Scope': return 'OUT_OF_SCOPE';
+        case 'Non-GST Supply': return 'NON_GST_SUPPLY';
+        default: return 'TAXABLE';
     }
-    
-    const sellingPrice = parseFloat(data.sellingPrice);
-    if (isNaN(sellingPrice)) {
-        throw new Error('Selling price must be a valid number');
-    }
+};
 
-    const productData = {
-        name: data.name,
-        type: data.type ? data.type.toUpperCase() : 'GOODS',
-        unit: data.unit || null,
-        hsnCode: data.hsnCode || null,
-        taxPreference: data.taxPreference === 'Tax Exempt' ? 'TAX_EXEMPT' : 'TAXABLE',
-        itemImage: data.imageUrl || data.itemImage || null,
-        sellingPrice,
-        description: data.description || null,
-        intraStateTaxRate: data.intraStateTaxRate || null,
-        interStateTaxRate: data.interStateTaxRate || null,
-        userId: data.userId
+const createProduct = async (userId, data) => {
+    const {
+        name, type, unit, hsnCode, taxPreference, 
+        intraStateTaxRate, interStateTaxRate, sellingPrice, 
+        description, imageUrl
+    } = data;
+
+    const productPayload = {
+        userId,
+        name,
+        type: type === 'service' ? 'SERVICE' : 'GOODS',
+        unit,
+        hsnCode: hsnCode || null,
+        taxPreference: mapTaxPreference(taxPreference),
+        intraStateTaxRate: intraStateTaxRate || null,
+        interStateTaxRate: interStateTaxRate || null,
+        sellingPrice: Number(sellingPrice),
+        description: description || null,
+        itemImage: imageUrl || null
     };
 
-    return await ProductModel.createProduct(productData);
+    return await prisma.product.create({
+        data: productPayload
+    });
 };
 
-const getProductsByUser = async (userId) => {
-    return await ProductModel.findAllProducts(userId);
+const getProducts = async (userId) => {
+    return await prisma.product.findMany({
+        where: { userId },
+        orderBy: { createdAt: 'desc' }
+    });
 };
 
-const getProductById = async (id) => {
-    const product = await ProductModel.findProductById(id);
-    if (!product) throw new Error('Product not found');
+const getProductById = async (userId, productId) => {
+    const product = await prisma.product.findFirst({
+        where: { id: productId, userId }
+    });
+
+    if (!product) {
+        throw new AppError("Product not found", 404);
+    }
     return product;
+};
+
+const updateProduct = async (userId, productId, data) => {
+    const product = await prisma.product.findFirst({
+        where: { id: productId, userId }
+    });
+
+    if (!product) {
+        throw new AppError("Product not found", 404);
+    }
+
+    const {
+        name, type, unit, hsnCode, taxPreference, 
+        intraStateTaxRate, interStateTaxRate, sellingPrice, 
+        description, imageUrl
+    } = data;
+
+    const updates = {
+        name,
+        type: type === 'service' ? 'SERVICE' : 'GOODS',
+        unit,
+        hsnCode: hsnCode || null,
+        taxPreference: mapTaxPreference(taxPreference),
+        intraStateTaxRate: intraStateTaxRate || null,
+        interStateTaxRate: interStateTaxRate || null,
+        sellingPrice: Number(sellingPrice),
+        description: description || null,
+    };
+
+    if (imageUrl !== undefined) {
+        updates.itemImage = imageUrl;
+    }
+
+    return await prisma.product.update({
+        where: { id: productId },
+        data: updates
+    });
+};
+
+const deleteProduct = async (userId, productId) => {
+    const product = await prisma.product.findFirst({
+        where: { id: productId, userId }
+    });
+
+    if (!product) {
+        throw new AppError("Product not found", 404);
+    }
+
+    await prisma.product.delete({
+        where: { id: productId }
+    });
+
+    return { message: "Product deleted successfully" };
 };
 
 module.exports = {
     createProduct,
-    getProductsByUser,
-    getProductById
+    getProducts,
+    getProductById,
+    updateProduct,
+    deleteProduct
 };
