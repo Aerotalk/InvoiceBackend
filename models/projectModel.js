@@ -28,6 +28,18 @@ const ProjectModel = {
                 }
             }
         });
+    },
+    async updateProject(id, data) {
+        return prisma.project.update({
+            where: { id },
+            data,
+            include: {
+                customer: true,
+                vendors: {
+                    include: { vendor: true }
+                }
+            }
+        });
     }
 };
 

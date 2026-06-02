@@ -31,8 +31,24 @@ const getProjectById = asyncHandler(async (req, res, next) => {
     res.status(200).json({ success: true, data: project });
 });
 
+const updateProject = asyncHandler(async (req, res, next) => {
+    logger.info(`📝 Updating project ID: ${req.params.id}...`);
+    const project = await projectService.updateProject(req.params.id, req.body, req.user.id);
+    logger.info(`✅ Successfully updated project: ${project.projectName}`);
+    res.status(200).json({ success: true, data: project });
+});
+
+const uploadProjectInvoice = asyncHandler(async (req, res, next) => {
+    logger.info(`📤 Uploading invoice for project ID: ${req.params.id}...`);
+    const project = await projectService.uploadProjectInvoice(req.params.id, req.body, req.user.id);
+    logger.info(`✅ Successfully uploaded invoice for project: ${project.projectName}`);
+    res.status(200).json({ success: true, data: project });
+});
+
 module.exports = {
     createProject,
     getProjects,
-    getProjectById
+    getProjectById,
+    updateProject,
+    uploadProjectInvoice
 };

@@ -57,8 +57,42 @@ const getProjectById = async (id) => {
     return project;
 };
 
+const updateProject = async (id, data, userId) => {
+    const project = await ProjectModel.findProjectById(id);
+    if (!project) throw new Error('Project not found');
+    if (project.userId !== userId) throw new Error('Not authorized to update this project');
+
+    const updateData = {};
+    if (data.notes !== undefined) updateData.notes = data.notes;
+    if (data.status !== undefined) updateData.status = data.status;
+    if (data.entities !== undefined) updateData.entities = data.entities;
+
+    return await ProjectModel.updateProject(id, updateData);
+};
+
+const uploadProjectInvoice = async (id, invoiceData, userId) => {
+    const project = await ProjectModel.findProjectById(id);
+    if (!project) throw new Error('Project not found');
+    if (project.userId !== userId) throw new Error('Not authorized to update this project');
+
+    let currentInvoices = [];
+    if (project.invoices) {
+        if (typeof project.invoices === 'string') {
+            try { currentInvoices = JSON.parse(project.invoices); } catch (e) {}
+        } else if (Array.isArray(project.invoices)) {
+            currentInvoices = project.invoices;
+        }
+    }
+
+    currentInvoices.push(invoiceData);
+    
+    return await ProjectModel.updateProject(id, { invoices: currentInvoices });
+};
+
 module.exports = {
     createProject,
     getProjectsByUser,
-    getProjectById
+    getProjectById,
+    updateProject,
+    uploadProjectInvoice
 };
