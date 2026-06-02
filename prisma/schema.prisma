@@ -33,6 +33,7 @@ model User {
   deliveryChallans DeliveryChallan[]
   settings    UserSettings?
   expenses    Expense[]
+  uploadedFiles UploadedFile[]
 
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
@@ -469,4 +470,18 @@ model Expense {
 
   createdAt           DateTime  @default(now())
   updatedAt           DateTime  @updatedAt
+}
+
+model UploadedFile {
+  id           String   @id @default(uuid())
+  originalName String
+  key          String   @unique
+  url          String
+  mimeType     String
+  size         Int
+  
+  userId       String?
+  user         User?    @relation(fields: [userId], references: [id])
+  
+  createdAt    DateTime @default(now())
 }
