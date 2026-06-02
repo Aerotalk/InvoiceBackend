@@ -186,34 +186,66 @@ const generatePdf = async (userId, id) => {
     const totalQuantity = quotation.items.reduce((sum, item) => sum + item.quantity, 0);
     const totalTax = quotation.taxAmount || 0;
     
-    // Number to words converter (simple version or rely on a library if one is installed, but since we just need something basic we'll pass the exact amount as string)
-    // The previous template expected totalAmountInWords.
     const toWords = require('number-to-words');
-    const amountInWords = (toWords.toWords(quotation.totalAmount) + ' rupees only').replace(/(^\w|\s\w)/g, m => m.toUpperCase());
-    const logoBase64 = require('../utils/logoBase64');
-    
+    const amountInWords = (toWords.toWords(Math.floor(quotation.totalAmount)) + ' rupees only').replace(/(^\w|\s\w)/g, m => m.toUpperCase());
+
+    // Read logo from file (templates/logo/logo.png)
+    const logoPath = path.join(__dirname, '../templates/logo/logo.png');
+    const logoBase64 = fs.existsSync(logoPath) ? fs.readFileSync(logoPath).toString('base64') : '';
+
+    // Fetch user settings for company details
+    const settings = await prisma.userSettings.findUnique({ where: { userId } });
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+
+    // Parse billing addresses from settings (stored as array of strings)
+    let billingAddressLine = '';
+    if (settings && settings.billingAddresses && settings.billingAddresses.length > 0) {
+        try {
+            const addrObj = JSON.parse(settings.billingAddresses[0]);
+            billingAddressLine = [addrObj.street1, addrObj.street2, addrObj.city, addrObj.state, addrObj.zip].filter(Boolean).join(', ');
+        } catch(e) {
+            billingAddressLine = settings.billingAddresses[0] || '';
+        }
+    }
+
+    const companyName = (settings && settings.workspaceBrandName) || (user && user.companyName) || 'GRIVETY GLOBAL PRIVATE LIMITED';
+
     const data = {
         logoUrl: `data:image/png;base64,${logoBase64}`,
+        // Company details from settings
+        companyName,
+        companyAddress: billingAddressLine || 'Disha Apartment, Flat No. 2, Ground Floor, DA-4/13, Deshbandhu Nagar, Joramondir, Baguiati, VIP Road, Kolkata-700059',
+        companyPhone: '033 40037666',
+        companyEmail: (user && user.email) || 'info@grivetyglobal.com',
+        companyGstin: '19AAHCG8472G1Z6',
+        companyState: '19-West Bengal',
+        companyPan: 'AAHCG8472G',
+        // Bank details
+        bankName: 'Axis Bank Ltd',
+        bankAccountNo: '926020010304892',
+        bankIfsc: 'UTIB0005408',
+        bankAccountHolder: companyName,
+        // Quote fields
         quoteNumber: quotation.quoteNumber,
-        quoteDate: quotation.quoteDate.toLocaleDateString('en-GB'),
-        expiryDate: quotation.expiryDate ? quotation.expiryDate.toLocaleDateString('en-GB') : '',
+        quoteDate: quotation.quoteDate.toLocaleDateString('en-GB').replace(/\//g, '/'),
+        expiryDate: quotation.expiryDate ? quotation.expiryDate.toLocaleDateString('en-GB').replace(/\//g, '/') : '',
         customer: quotation.customer,
-        clientCompanySnapshot: quotation.clientCompanySnapshot,
-        clientNameSnapshot: quotation.clientNameSnapshot,
-        salesperson: quotation.salesperson,
+        clientCompanySnapshot: quotation.clientCompanySnapshot || (quotation.customer && (quotation.customer.companyName || quotation.customer.displayName)) || '',
+        clientNameSnapshot: quotation.clientNameSnapshot || (quotation.customer && quotation.customer.displayName) || '',
+        salesperson: quotation.salesperson || '',
         salespersonEmail: '',
         salespersonMobile: '',
         items: quotation.items.map((item, index) => ({
             index: index + 1,
             name: item.productNameSnapshot || 'Custom Item',
-            description: '',
+            description: item.customDetails || '',
             hsn: '',
             quantity: item.quantity,
             unit: 'Nos',
             rate: item.rate.toFixed(2),
             taxableAmount: (item.quantity * item.rate).toFixed(2),
-            tax: quotation.taxRate || 18,
-            taxAmount: ((item.quantity * item.rate) * (quotation.taxRate || 18) / 100).toFixed(2),
+            tax: item.tax || (quotation.taxRate || 18),
+            taxAmount: item.taxAmount ? item.taxAmount.toFixed(2) : ((item.quantity * item.rate) * (quotation.taxRate || 18) / 100).toFixed(2),
             amount: item.amount.toFixed(2)
         })),
         totalQuantity,
@@ -223,7 +255,7 @@ const generatePdf = async (userId, id) => {
         cgst: (Number(totalTax) / 2).toFixed(2),
         totalAmount: quotation.totalAmount.toFixed(2),
         totalAmountInWords: amountInWords,
-        termsConditions: quotation.termsConditions || '1. Validity of Quotation...\n2. Pricing...',
+        termsConditions: quotation.termsConditions || '',
         customerNotes: quotation.customerNotes,
         signatureUrl: quotation.signatureUrl
     };

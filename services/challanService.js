@@ -131,49 +131,85 @@ const generatePdf = async (id) => {
     const templateHtml = fs.readFileSync(templatePath, 'utf8');
     const template = handlebars.compile(templateHtml);
     
-    const logoBase64 = require('../utils/logoBase64');
+    const logoBase64 = fs.existsSync(path.join(__dirname, '../templates/logo/logo.png'))
+        ? fs.readFileSync(path.join(__dirname, '../templates/logo/logo.png')).toString('base64')
+        : '';
     
-        const toWords = require('number-to-words');
-        const totalAmountInWords = (toWords.toWords(challan.totalAmount) + ' rupees only').replace(/(^\w|\s\w)/g, m => m.toUpperCase());
+    const toWords = require('number-to-words');
+    const totalAmountInWords = (toWords.toWords(Math.floor(challan.totalAmount)) + ' rupees only').replace(/(^\w|\s\w)/g, m => m.toUpperCase());
 
-        let totalQuantity = 0;
-        let totalTax = 0;
+    let totalQuantity = 0;
+    let totalTax = 0;
 
-        const data = {
-            logoUrl: `data:image/png;base64,${logoBase64}`,
-            challanNumber: challan.challanNumber,
-            referenceNumber: challan.referenceNumber,
-            challanDate: challan.challanDate.toLocaleDateString('en-GB'),
-            customer: challan.customer,
-            clientCompanySnapshot: challan.clientCompanySnapshot,
-            clientNameSnapshot: challan.clientNameSnapshot,
-            items: challan.items.map((item, index) => {
-                totalQuantity += item.quantity;
-                totalTax += item.taxAmount;
-                const taxableAmount = item.amount - item.taxAmount;
-                return {
-                    index: index + 1,
-                    name: item.productNameSnapshot || (item.product ? item.product.name : 'Custom Item'),
-                    hsn: item.product ? item.product.hsn : '',
-                    unit: item.product ? item.product.unit : 'pcs',
-                    quantity: item.quantity,
-                    rate: item.rate.toFixed(2),
-                    taxableAmount: taxableAmount.toFixed(2),
-                    tax: item.tax ? `${item.tax}%` : '18%',
-                    amount: item.amount.toFixed(2)
-                };
-            }),
-            totalQuantity: totalQuantity,
-            totalTax: totalTax.toFixed(2),
-            sgst: (totalTax / 2).toFixed(2),
-            cgst: (totalTax / 2).toFixed(2),
-            subTotal: challan.subTotal.toFixed(2),
-            totalAmount: challan.totalAmount.toFixed(2),
-            totalAmountInWords: totalAmountInWords,
-            termsConditions: challan.termsConditions,
-            customerNotes: challan.customerNotes,
-            signatureUrl: challan.signatureUrl
-        };
+    // Fetch user settings for company details
+    const userId = challan.userId;
+    const settings = await prisma.userSettings.findUnique({ where: { userId } });
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+
+    let billingAddressLine = '';
+    if (settings && settings.billingAddresses && settings.billingAddresses.length > 0) {
+        try {
+            const addrObj = JSON.parse(settings.billingAddresses[0]);
+            billingAddressLine = [addrObj.street1, addrObj.street2, addrObj.city, addrObj.state, addrObj.zip].filter(Boolean).join(', ');
+        } catch(e) {
+            billingAddressLine = settings.billingAddresses[0] || '';
+        }
+    }
+
+    const companyName = (settings && settings.workspaceBrandName) || (user && user.companyName) || 'GRIVETY GLOBAL PRIVATE LIMITED';
+
+    const data = {
+        logoUrl: `data:image/png;base64,${logoBase64}`,
+        // Company details
+        companyName,
+        companyAddress: billingAddressLine || 'Disha Apartment, Flat No. 2, Ground Floor, DA-4/13, Deshbandhu Nagar, Joramondir, Baguiati, VIP Road, Kolkata-700059',
+        companyPhone: '033 40037666',
+        companyEmail: (user && user.email) || 'info@grivetyglobal.com',
+        companyGstin: '19AAHCG8472G1Z6',
+        companyState: '19-West Bengal',
+        companyPan: 'AAHCG8472G',
+        // Bank details
+        bankName: 'Axis Bank Ltd',
+        bankAccountNo: '926020010304892',
+        bankIfsc: 'UTIB0005408',
+        bankAccountHolder: companyName,
+        // Challan fields
+        challanNumber: challan.challanNumber,
+        referenceNumber: challan.referenceNumber,
+        challanDate: challan.challanDate.toLocaleDateString('en-GB'),
+        transportMode: challan.transportMode,
+        deliveryLocation: challan.deliveryLocation,
+        customer: challan.customer,
+        clientCompanySnapshot: challan.clientCompanySnapshot || (challan.customer && (challan.customer.companyName || challan.customer.displayName)) || '',
+        clientNameSnapshot: challan.clientNameSnapshot || (challan.customer && challan.customer.displayName) || '',
+        items: challan.items.map((item, index) => {
+            totalQuantity += item.quantity;
+            totalTax += item.taxAmount;
+            const taxableAmount = item.amount - item.taxAmount;
+            return {
+                index: index + 1,
+                name: item.productNameSnapshot || (item.product ? item.product.name : 'Custom Item'),
+                description: item.customDetails || '',
+                hsn: item.product ? item.product.hsn : '',
+                unit: item.product ? item.product.unit : 'Pcs',
+                quantity: item.quantity,
+                rate: item.rate.toFixed(2),
+                taxableAmount: taxableAmount.toFixed(2),
+                tax: item.tax ? `${item.tax}%` : '18%',
+                amount: item.amount.toFixed(2)
+            };
+        }),
+        totalQuantity: totalQuantity,
+        totalTax: totalTax.toFixed(2),
+        sgst: (totalTax / 2).toFixed(2),
+        cgst: (totalTax / 2).toFixed(2),
+        subTotal: challan.subTotal.toFixed(2),
+        totalAmount: challan.totalAmount.toFixed(2),
+        totalAmountInWords: totalAmountInWords,
+        termsConditions: challan.termsConditions || '',
+        customerNotes: challan.customerNotes,
+        signatureUrl: challan.signatureUrl
+    };
 
     const finalHtml = template(data);
 

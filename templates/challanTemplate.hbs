@@ -1,188 +1,436 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <style>
-        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 10px; color: #333; margin: 0; padding: 0; }
-        .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
-        .logo { max-width: 200px; }
-        .company-details { text-align: right; font-size: 10px; line-height: 1.4; }
-        .company-name { font-size: 14px; font-weight: bold; margin-bottom: 5px; }
-        .title { text-align: center; font-size: 16px; font-weight: bold; color: #888; text-transform: uppercase; margin: 20px 0; border-bottom: 2px solid #ddd; padding-bottom: 5px; }
-        .info-section { display: flex; justify-content: space-between; margin-bottom: 20px; }
-        .info-col { width: 48%; line-height: 1.5; }
-        .info-col h3 { font-size: 12px; margin: 0 0 5px 0; color: #000; }
-        .table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-        .table th { background-color: #999; color: #fff; padding: 8px; text-align: left; font-size: 10px; }
-        .table td { padding: 8px; border-bottom: 1px solid #ddd; font-size: 10px; }
-        .text-right { text-align: right !important; }
-        .summary-section { display: flex; justify-content: flex-end; margin-bottom: 20px; }
-        .summary-table { width: 300px; border-collapse: collapse; }
-        .summary-table th { background-color: #999; color: #fff; padding: 5px; text-align: left; }
-        .summary-table td { padding: 5px; text-align: right; border-bottom: 1px solid #ddd; }
-        .summary-table .bold { font-weight: bold; }
-        .tax-table { width: 60%; border-collapse: collapse; margin-bottom: 20px; }
-        .tax-table th { background-color: #999; color: #fff; padding: 5px; text-align: left; }
-        .tax-table td { padding: 5px; border-bottom: 1px solid #ddd; }
-        .words-section { background-color: #999; color: #fff; padding: 5px; font-weight: bold; }
-        .words-text { padding: 5px; border-bottom: 1px solid #ddd; margin-bottom: 20px; }
-        .terms, .bank { background-color: #999; color: #fff; padding: 5px; font-weight: bold; margin-bottom: 5px; }
-        .footer-section { display: flex; justify-content: space-between; page-break-inside: avoid; }
-        .footer-col { width: 48%; font-size: 9px; line-height: 1.4; }
-        .signature { text-align: right; }
-        .signature img { max-width: 150px; margin-top: 10px; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Delivery Challan</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: Arial, sans-serif;
+      font-size: 11px;
+      color: #222;
+      background: #fff;
+      padding: 24px 28px;
+    }
+
+    /* ── HEADER ── */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+      border-bottom: 2px solid #222;
+      padding-bottom: 12px;
+    }
+    .header-logo img {
+      max-width: 120px;
+      max-height: 80px;
+      object-fit: contain;
+    }
+    .header-company {
+      text-align: right;
+      max-width: 55%;
+    }
+    .header-company h1 {
+      font-size: 15px;
+      font-weight: bold;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .header-company p {
+      font-size: 10px;
+      line-height: 1.5;
+      color: #333;
+    }
+
+    /* ── DOC TITLE ── */
+    .doc-title {
+      text-align: center;
+      font-size: 12px;
+      font-style: italic;
+      color: #444;
+      border-bottom: 1px solid #ccc;
+      border-top: 1px solid #ccc;
+      padding: 6px 0;
+      margin-bottom: 14px;
+    }
+
+    /* ── CHALLAN SECTION ── */
+    .challan-section {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 12px;
+    }
+    .challan-for {
+      width: 50%;
+    }
+    .challan-for .label,
+    .challan-details .label {
+      font-size: 11px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    .challan-for .company-name {
+      font-weight: bold;
+      font-size: 11.5px;
+    }
+    .challan-for p {
+      font-size: 10.5px;
+      line-height: 1.6;
+    }
+    .challan-details {
+      width: 46%;
+      text-align: right;
+    }
+    .challan-details table {
+      width: 100%;
+      font-size: 10.5px;
+    }
+    .challan-details table td {
+      padding: 1px 2px;
+      line-height: 1.6;
+    }
+    .challan-details table td:first-child {
+      text-align: right;
+      color: #555;
+    }
+    .challan-details table td:last-child {
+      text-align: right;
+      font-weight: bold;
+    }
+
+    /* ── ITEMS TABLE ── */
+    .items-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 14px;
+      font-size: 10.5px;
+    }
+    .items-table th {
+      background: #e8e8e8;
+      border: 1px solid #bbb;
+      padding: 5px 6px;
+      text-align: center;
+      font-weight: bold;
+      font-size: 10px;
+    }
+    .items-table td {
+      border: 1px solid #ccc;
+      padding: 5px 6px;
+      vertical-align: top;
+    }
+    .items-table td.num { text-align: center; }
+    .items-table td.right { text-align: right; }
+    .items-table td.center { text-align: center; }
+    .items-table tr.total-row td {
+      font-weight: bold;
+      background: #f7f7f7;
+      border-top: 2px solid #aaa;
+    }
+
+    /* ── BOTTOM SECTION: TAX + AMOUNTS ── */
+    .bottom-section {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 14px;
+      align-items: flex-start;
+    }
+    .tax-table-wrap { width: 52%; }
+    .amounts-wrap { width: 46%; }
+
+    .tax-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 10.5px;
+    }
+    .tax-table th {
+      background: #e8e8e8;
+      border: 1px solid #bbb;
+      padding: 5px 6px;
+      font-size: 10px;
+    }
+    .tax-table td {
+      border: 1px solid #ccc;
+      padding: 5px 6px;
+      text-align: right;
+    }
+    .tax-table td:first-child { text-align: left; }
+
+    .amounts-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 10.5px;
+    }
+    .amounts-table th {
+      background: #e8e8e8;
+      border: 1px solid #bbb;
+      padding: 5px 8px;
+      text-align: left;
+      font-size: 10px;
+    }
+    .amounts-table td {
+      border: 1px solid #ccc;
+      padding: 5px 8px;
+    }
+    .amounts-table td:last-child { text-align: right; }
+    .amounts-table tr.total-row td { font-weight: bold; }
+
+    /* ── GRAY SECTION HEADER ── */
+    .section-header {
+      background: #d5d5d5;
+      padding: 5px 8px;
+      font-size: 10.5px;
+      font-weight: bold;
+      margin-bottom: 6px;
+      margin-top: 12px;
+    }
+    .section-text {
+      font-size: 10.5px;
+      line-height: 1.7;
+      padding: 0 4px;
+      margin-bottom: 6px;
+      white-space: pre-wrap;
+    }
+
+    /* ── BANK DETAILS ── */
+    .bank-details p {
+      font-size: 10.5px;
+      line-height: 1.8;
+      padding: 0 4px;
+    }
+
+    /* ── SIGNATURE ── */
+    .signature-section {
+      text-align: right;
+      margin-top: -60px;
+      padding-right: 4px;
+    }
+    .signature-section .for-company {
+      font-size: 10.5px;
+      margin-bottom: 6px;
+    }
+    .signature-section img {
+      max-height: 60px;
+      max-width: 150px;
+      display: block;
+      margin-left: auto;
+      margin-bottom: 4px;
+    }
+    .signature-section .sig-line {
+      border-top: 1px solid #333;
+      width: 160px;
+      margin-left: auto;
+      margin-bottom: 4px;
+    }
+    .signature-section .authorized {
+      font-size: 10.5px;
+      font-weight: bold;
+    }
+
+    /* ── FOOTER WRAP ── */
+    .footer-row {
+      display: flex;
+      gap: 20px;
+      margin-top: 12px;
+    }
+    .footer-left { width: 55%; }
+    .footer-right { width: 45%; }
+  </style>
 </head>
 <body>
-    <div class="header">
-        <div class="logo">
-            <img src="{{logoUrl}}" alt="Grivety Global Logo" style="max-height: 50px; width: auto;" />
-        </div>
-        <div class="company-details">
-            <div class="company-name">GRIVETY GLOBAL PRIVATE LIMITED</div>
-            <div>Disha Apartment, Flat No. 2, Ground Floor, DA-4/13,</div>
-            <div>Deshbandhu Nagar, Joramondir, Baguiati, VIP Road, Kolkata-700059</div>
-            <div>Phone no.: 033 40037666 Email: info@grivetyglobal.com</div>
-            <div>GSTIN: 19AAHCG8472G1Z6, State: 19-West Bengal</div>
-            <div>PAN: AAHCG8472G</div>
-        </div>
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-logo">
+      {{#if logoUrl}}
+        <img src="{{logoUrl}}" alt="Company Logo" />
+      {{/if}}
     </div>
-
-    <div class="title">Delivery Challan</div>
-
-    <div class="info-section">
-        <div class="info-col">
-            <h3>Challan For</h3>
-            <div style="font-weight: bold; font-size: 11px; margin-bottom: 5px;">{{customer.displayName}}</div>
-            {{#if customer.billingStreet1}}<div>{{customer.billingStreet1}}</div>{{/if}}
-            {{#if customer.billingStreet2}}<div>{{customer.billingStreet2}}</div>{{/if}}
-            <div>{{customer.billingCity}}{{#if customer.billingZipCode}}-{{customer.billingZipCode}}{{/if}}</div>
-            <div style="margin-top: 5px;">Contact No. : {{customer.workPhone}}</div>
-            <div>State: {{customer.billingState}}</div>
-        </div>
-        <div class="info-col text-right">
-            <h3>Challan Details</h3>
-            <div>Challan No. : {{challanNumber}}</div>
-            <div>Date : {{challanDate}}</div>
-            <div>Place of supply: {{customer.placeOfSupply}}</div>
-            <div>Transport Mode: {{transportMode}}</div>
-        </div>
+    <div class="header-company">
+      <h1>{{companyName}}</h1>
+      <p>{{companyAddress}}</p>
+      <p>Phone no.: {{companyPhone}} Email: {{companyEmail}}</p>
+      <p>GSTIN: {{companyGstin}}, State: {{companyState}}</p>
+      <p>PAN: {{companyPan}}</p>
     </div>
+  </div>
 
-    <table class="table">
+  <!-- TITLE -->
+  <div class="doc-title">Delivery Challan</div>
+
+  <!-- CHALLAN FOR / DETAILS -->
+  <div class="challan-section">
+    <div class="challan-for">
+      <div class="label">Delivered To</div>
+      <div class="company-name">{{clientCompanySnapshot}}</div>
+      <p>{{customer.billingStreet1}}{{#if customer.billingStreet2}}, {{customer.billingStreet2}}{{/if}}</p>
+      <p>{{customer.billingCity}}{{#if customer.billingZipCode}}-{{customer.billingZipCode}}{{/if}}</p>
+      <p>Contact No. : {{customer.workPhone}}{{#unless customer.workPhone}}{{customer.mobilePhone}}{{/unless}}</p>
+      <p>State: {{customer.billingState}}</p>
+    </div>
+    <div class="challan-details">
+      <div class="label">Challan Details</div>
+      <table>
+        <tr>
+          <td>Challan No. :</td>
+          <td>{{challanNumber}}</td>
+        </tr>
+        <tr>
+          <td>Date :</td>
+          <td>{{challanDate}}</td>
+        </tr>
+        <tr>
+          <td>Place of supply:</td>
+          <td>{{customer.billingState}}</td>
+        </tr>
+        {{#if referenceNumber}}
+        <tr>
+          <td>Ref No. :</td>
+          <td>{{referenceNumber}}</td>
+        </tr>
+        {{/if}}
+        {{#if transportMode}}
+        <tr>
+          <td>Transport Mode:</td>
+          <td>{{transportMode}}</td>
+        </tr>
+        {{/if}}
+        {{#if deliveryLocation}}
+        <tr>
+          <td>Delivery Location:</td>
+          <td>{{deliveryLocation}}</td>
+        </tr>
+        {{/if}}
+      </table>
+    </div>
+  </div>
+
+  <!-- ITEMS TABLE -->
+  <table class="items-table">
+    <thead>
+      <tr>
+        <th style="width:28px">#</th>
+        <th style="text-align:left">Item name</th>
+        <th>HSN/SAC</th>
+        <th>Quantity</th>
+        <th>Unit</th>
+        <th>Price/ Unit</th>
+        <th>Taxable amount</th>
+        <th>GST</th>
+        <th>Amount</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each items}}
+      <tr>
+        <td class="num">{{index}}</td>
+        <td><strong>{{name}}</strong>{{#if description}}<br/><span style="color:#555;font-size:9.5px">{{description}}</span>{{/if}}</td>
+        <td class="center">{{hsn}}</td>
+        <td class="center">{{quantity}}</td>
+        <td class="center">{{unit}}</td>
+        <td class="right">₹ {{rate}}</td>
+        <td class="right">₹ {{taxableAmount}}</td>
+        <td class="center">{{tax}}</td>
+        <td class="right">₹ {{amount}}</td>
+      </tr>
+      {{/each}}
+      <tr class="total-row">
+        <td colspan="3">Total</td>
+        <td class="center">{{totalQuantity}}</td>
+        <td></td>
+        <td></td>
+        <td class="right">₹ {{subTotal}}</td>
+        <td class="right">₹ {{totalTax}}</td>
+        <td class="right">₹ {{totalAmount}}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- TAX SUMMARY + AMOUNTS -->
+  <div class="bottom-section">
+    <div class="tax-table-wrap">
+      <table class="tax-table">
         <thead>
-            <tr>
-                <th>#</th>
-                <th>Item name</th>
-                <th>HSN/SAC</th>
-                <th class="text-right">Quantity</th>
-                <th>Unit</th>
-                <th class="text-right">Price/ Unit</th>
-                <th class="text-right">Taxable amount</th>
-                <th class="text-right">GST</th>
-                <th class="text-right">Amount</th>
-            </tr>
+          <tr>
+            <th style="text-align:left">Tax type</th>
+            <th>Taxable amount</th>
+            <th>Rate</th>
+            <th>Tax amount</th>
+          </tr>
         </thead>
         <tbody>
-            {{#each items}}
-            <tr>
-                <td style="vertical-align: top;">{{this.index}}</td>
-                <td style="vertical-align: top;">
-                    <strong>{{this.name}}</strong>
-                    {{#if this.description}}
-                    <div style="font-size: 8.5px; color: #555; margin-top: 3px; white-space: pre-wrap;">{{this.description}}</div>
-                    {{/if}}
-                </td>
-                <td style="vertical-align: top;">{{this.hsn}}</td>
-                <td class="text-right" style="vertical-align: top;">{{this.quantity}}</td>
-                <td style="vertical-align: top;">{{this.unit}}</td>
-                <td class="text-right" style="vertical-align: top;">₹ {{this.rate}}</td>
-                <td class="text-right" style="vertical-align: top;">₹ {{this.taxableAmount}}</td>
-                <td class="text-right" style="vertical-align: top;">{{this.tax}}</td>
-                <td class="text-right" style="vertical-align: top;">₹ {{this.amount}}</td>
-            </tr>
-            {{/each}}
-            <tr>
-                <td colspan="3"><strong>Total</strong></td>
-                <td class="text-right"><strong>{{totalQuantity}}</strong></td>
-                <td colspan="2"></td>
-                <td class="text-right"><strong>₹ {{subTotal}}</strong></td>
-                <td class="text-right"><strong>₹ {{totalTax}}</strong></td>
-                <td class="text-right"><strong>₹ {{totalAmount}}</strong></td>
-            </tr>
+          <tr>
+            <td>SGST</td>
+            <td>₹ {{subTotal}}</td>
+            <td>9%</td>
+            <td>₹ {{sgst}}</td>
+          </tr>
+          <tr>
+            <td>CGST</td>
+            <td>₹ {{subTotal}}</td>
+            <td>9%</td>
+            <td>₹ {{cgst}}</td>
+          </tr>
         </tbody>
-    </table>
-
-    <div style="display: flex; justify-content: space-between;">
-        <table class="tax-table">
-            <thead>
-                <tr>
-                    <th>Tax type</th>
-                    <th class="text-right">Taxable amount</th>
-                    <th class="text-right">Rate</th>
-                    <th class="text-right">Tax amount</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>SGST</td>
-                    <td class="text-right">₹ {{subTotal}}</td>
-                    <td class="text-right">9%</td>
-                    <td class="text-right">₹ {{sgst}}</td>
-                </tr>
-                <tr>
-                    <td>CGST</td>
-                    <td class="text-right">₹ {{subTotal}}</td>
-                    <td class="text-right">9%</td>
-                    <td class="text-right">₹ {{cgst}}</td>
-                </tr>
-            </tbody>
-        </table>
-
-        <table class="summary-table">
-            <thead>
-                <tr>
-                    <th colspan="2">Amounts</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Sub Total</td>
-                    <td class="bold">₹ {{subTotal}}</td>
-                </tr>
-                <tr>
-                    <td class="bold">Total</td>
-                    <td class="bold">₹ {{totalAmount}}</td>
-                </tr>
-            </tbody>
-        </table>
+      </table>
     </div>
-
-    <div class="words-section">Challan Amount In Words</div>
-    <div class="words-text">{{totalAmountInWords}}</div>
-
-    <div class="footer-section">
-        <div class="footer-col">
-            <div class="terms">Terms and Conditions</div>
-            <div style="white-space: pre-wrap;">{{termsConditions}}</div>
-            
-            <div class="bank" style="margin-top: 20px;">Bank Details</div>
-            <div>Name : Axis Bank Ltd</div>
-            <div>Account No. : 926020010304892</div>
-            <div>IFSC code : UTIB0005408</div>
-            <div>Account holder's name : GRIVETY GLOBAL PRIVATE LIMITED</div>
-        </div>
-        <div class="footer-col signature">
-            <div style="margin-top: 40px;">For : GRIVETY GLOBAL PRIVATE LIMITED</div>
-            {{#if signatureUrl}}
-            <div style="margin-top: 10px;">
-                <img src="{{signatureUrl}}" alt="Signature" style="max-height: 50px; max-width: 150px; object-fit: contain;">
-            </div>
-            {{else}}
-            <div style="margin-top: 50px; border-bottom: 1px solid #000; width: 150px; display: inline-block;"></div>
-            {{/if}}
-            <div style="margin-top: 10px; font-weight: bold;">Authorized Signatory</div>
-        </div>
+    <div class="amounts-wrap">
+      <table class="amounts-table">
+        <thead>
+          <tr>
+            <th colspan="2">Amounts</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Sub Total</td>
+            <td>₹ {{subTotal}}</td>
+          </tr>
+          <tr class="total-row">
+            <td>Total</td>
+            <td>₹ {{totalAmount}}</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
+  </div>
+
+  <!-- AMOUNT IN WORDS -->
+  <div class="section-header">Amount In Words</div>
+  <div class="section-text">{{totalAmountInWords}}</div>
+
+  <!-- FOOTER ROW: Terms + Signature -->
+  <div class="footer-row">
+    <div class="footer-left">
+      {{#if termsConditions}}
+        <div class="section-header" style="margin-top:10px">Terms and Conditions</div>
+        <div class="section-text">{{termsConditions}}</div>
+      {{/if}}
+
+      <div class="section-header" style="margin-top:10px">Bank Details</div>
+      <div class="bank-details">
+        <p>Name : {{bankName}}</p>
+        <p>Account No. : {{bankAccountNo}}</p>
+        <p>IFSC code : {{bankIfsc}}</p>
+        <p>Account holder's name : {{bankAccountHolder}}</p>
+      </div>
+    </div>
+    <div class="footer-right">
+      <div class="signature-section">
+        <p class="for-company">For : {{companyName}}</p>
+        {{#if signatureUrl}}
+          <img src="{{signatureUrl}}" alt="Signature" />
+        {{else}}
+          <div style="height:55px"></div>
+        {{/if}}
+        <div class="sig-line"></div>
+        <p class="authorized">Authorized Signatory</p>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>
