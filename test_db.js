@@ -1,0 +1,1 @@
+const { PrismaClient } = require('@prisma/client'); const prisma = new PrismaClient(); prisma.purchaseOrder.findFirst({ include: { items: true, vendor: true } }).then(console.log).finally(() => prisma.$disconnect());

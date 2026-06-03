@@ -1,0 +1,1 @@
+const { generatePdf } = require('./services/purchaseOrderService'); const fs = require('fs'); generatePdf('ccf2d180-eb0f-4edf-8052-33184d624b2b', '2ceba973-a884-4d6f-b6ef-4f979e18b56f').then(buffer => { fs.writeFileSync('test_po.pdf', buffer); console.log('PDF generated! Size:', buffer.length); process.exit(0); }).catch(e => { console.error('Error:', e); process.exit(1); });
