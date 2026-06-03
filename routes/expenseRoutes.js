@@ -4,7 +4,8 @@ const {
     createExpense,
     createExpensesBulk,
     getExpenses,
-    deleteExpense
+    deleteExpense,
+    updateExpense
 } = require('../controllers/expenseController');
 const { protect } = require('../middlewares/authMiddleware');
 
@@ -16,6 +17,7 @@ router.route('/bulk')
     .post(protect, createExpensesBulk);
 
 router.route('/:id')
+    .put(protect, updateExpense)
     .delete(protect, deleteExpense);
 
 module.exports = router;

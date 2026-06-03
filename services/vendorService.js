@@ -109,11 +109,77 @@ const getVendorById = async (id) => {
 // @access  Internal Service Layer
 const updateVendor = async (id, data) => {
     logger.debug(`🐞 🏭 [VENDOR_SERVICE] ✏️ Preparing updates for vendor ${id}`);
-    const updates = {};
-    if (data.notes !== undefined) {
-        updates.internalRemarks = data.notes;
-    }
-    return await VendorModel.updateVendor(id, updates);
+    const updateData = {
+        vendorType: data.vendorType ? data.vendorType.toUpperCase() : undefined,
+        displayName: data.displayName,
+        primaryContactTitle: data.salutation,
+        primaryContactFirstName: data.firstName || (data.name ? data.name.split(' ')[0] : undefined),
+        primaryContactLastName: data.lastName || (data.name ? data.name.split(' ').slice(1).join(' ') : undefined),
+        companyName: data.company,
+        email: data.email,
+        vendorLanguage: data.language,
+        workPhoneCode: data.workPhoneCode,
+        workPhone: data.workPhone || data.phone,
+        mobilePhoneCode: data.mobileCode,
+        mobilePhone: data.mobile,
+        currency: data.currency,
+        gstTreatment: data.gstTreatment,
+        gstNumber: data.gstNumber,
+        pan: data.pan,
+        paymentTerms: data.paymentTerms,
+        websiteUrl: data.website,
+        department: data.department,
+        designation: data.designation,
+        skypeAddress: data.skype,
+        xProfileLink: data.socialX,
+        facebookPage: data.socialFacebook,
+        allowPortalAccess: data.enablePortal,
+        documentsAttachment: data.avatar,
+        status: data.status,
+        billingAttention: data.billingAddress?.attention,
+        billingStreet1: data.billingAddress?.street1,
+        billingStreet2: data.billingAddress?.street2,
+        billingCountry: data.billingAddress?.country,
+        billingState: data.billingAddress?.state,
+        billingCity: data.billingAddress?.city,
+        billingZipCode: data.billingAddress?.zip,
+        billingPhone: data.billingAddress?.phone,
+        billingFax: data.billingAddress?.fax,
+        shippingAttention: data.shippingAddress?.attention,
+        shippingStreet1: data.shippingAddress?.street1,
+        shippingStreet2: data.shippingAddress?.street2,
+        shippingCountry: data.shippingAddress?.country,
+        shippingState: data.shippingAddress?.state,
+        shippingCity: data.shippingAddress?.city,
+        shippingZipCode: data.shippingAddress?.zip,
+        shippingPhone: data.shippingAddress?.phone,
+        shippingFax: data.shippingAddress?.fax,
+        internalRemarks: data.notes || data.remarks,
+
+        contactPersons: data.contactPersons ? {
+            deleteMany: {},
+            create: data.contactPersons.map(cp => ({
+                salutation: cp.salutation || '',
+                firstName: cp.firstName || '',
+                lastName: cp.lastName || '',
+                email: cp.email || '',
+                phone: cp.phone || null
+            }))
+        } : undefined,
+
+        customFields: data.customFields ? {
+            deleteMany: {},
+            create: data.customFields.map(cf => ({
+                key: cf.label || cf.key || '',
+                value: cf.value || ''
+            }))
+        } : undefined
+    };
+
+    // Remove undefined values
+    Object.keys(updateData).forEach(key => updateData[key] === undefined && delete updateData[key]);
+    
+    return await VendorModel.updateVendor(id, updateData);
 };
 
 // @desc    Delete vendor

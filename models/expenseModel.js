@@ -37,6 +37,17 @@ const ExpenseModel = {
         return prisma.expense.delete({
             where: { id }
         });
+    },
+    async updateExpense(id, data) {
+        return prisma.expense.update({
+            where: { id },
+            data,
+            include: {
+                customer: true,
+                vendor: true,
+                project: true
+            }
+        });
     }
 };
 

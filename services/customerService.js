@@ -93,10 +93,77 @@ const getCustomerById = async (id) => {
 };
 
 const updateCustomer = async (id, data) => {
-    // Determine which fields to update
-    const updateData = {};
-    if (data.notes !== undefined) updateData.internalRemarks = data.notes;
-    // Add other fields as needed if the frontend sends them later
+    const updateData = {
+        customerType: data.clientType ? data.clientType.toUpperCase() : undefined,
+        displayName: data.displayName,
+        primaryContactTitle: data.salutation,
+        primaryContactFirstName: data.firstName || (data.name ? data.name.split(' ')[0] : undefined),
+        primaryContactLastName: data.lastName || (data.name ? data.name.split(' ').slice(1).join(' ') : undefined),
+        companyName: data.company,
+        email: data.email,
+        customerLanguage: data.language,
+        workPhoneCode: data.workPhoneCode,
+        workPhone: data.workPhone || data.phone,
+        mobilePhoneCode: data.mobileCode,
+        mobilePhone: data.mobile,
+        currency: data.currency,
+        gstTreatment: data.gstTreatment,
+        gstNumber: data.gstNumber,
+        pan: data.pan,
+        paymentTerms: data.paymentTerms,
+        placeOfSupply: data.placeOfSupply,
+        taxPreference: data.taxPreference ? (data.taxPreference === 'Tax Exempt' ? 'TAX_EXEMPT' : 'TAXABLE') : undefined,
+        websiteUrl: data.website,
+        department: data.department,
+        designation: data.designation,
+        skypeAddress: data.skype,
+        xProfileLink: data.socialX,
+        facebookPage: data.socialFacebook,
+        allowPortalAccess: data.enablePortal,
+        avatarUrl: data.avatar,
+        status: data.status,
+        billingAttention: data.billingAddress?.attention,
+        billingStreet1: data.billingAddress?.street1,
+        billingStreet2: data.billingAddress?.street2,
+        billingCountry: data.billingAddress?.country,
+        billingState: data.billingAddress?.state,
+        billingCity: data.billingAddress?.city,
+        billingZipCode: data.billingAddress?.zip,
+        billingPhone: data.billingAddress?.phone,
+        billingFax: data.billingAddress?.fax,
+        shippingAttention: data.shippingAddress?.attention,
+        shippingStreet1: data.shippingAddress?.street1,
+        shippingStreet2: data.shippingAddress?.street2,
+        shippingCountry: data.shippingAddress?.country,
+        shippingState: data.shippingAddress?.state,
+        shippingCity: data.shippingAddress?.city,
+        shippingZipCode: data.shippingAddress?.zip,
+        shippingPhone: data.shippingAddress?.phone,
+        shippingFax: data.shippingAddress?.fax,
+        internalRemarks: data.notes || data.remarks,
+
+        contactPersons: data.contactPersons ? {
+            deleteMany: {},
+            create: data.contactPersons.map(cp => ({
+                salutation: cp.salutation || '',
+                firstName: cp.firstName || '',
+                lastName: cp.lastName || '',
+                email: cp.email || '',
+                phone: cp.phone || null
+            }))
+        } : undefined,
+
+        customFields: data.customFields ? {
+            deleteMany: {},
+            create: data.customFields.map(cf => ({
+                key: cf.label || cf.key || '',
+                value: cf.value || ''
+            }))
+        } : undefined
+    };
+
+    // Remove undefined values
+    Object.keys(updateData).forEach(key => updateData[key] === undefined && delete updateData[key]);
     
     return await CustomerModel.updateCustomer(id, updateData);
 };

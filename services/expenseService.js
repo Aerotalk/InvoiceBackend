@@ -13,6 +13,9 @@ const ExpenseModel = {
     },
     async deleteExpense(id) {
         return require('../models/expenseModel').deleteExpense(id);
+    },
+    async updateExpense(id, data) {
+        return require('../models/expenseModel').updateExpense(id, data);
     }
 };
 
@@ -94,6 +97,33 @@ const expenseService = {
             throw new Error('Expense not found or unauthorized');
         }
         return ExpenseModel.deleteExpense(id);
+    },
+    async updateExpense(id, userId, expenseData) {
+        const expense = await ExpenseModel.findExpenseById(id);
+        if (!expense || expense.userId !== userId) {
+            throw new Error('Expense not found or unauthorized');
+        }
+
+        const payload = {
+            ...expenseData
+        };
+        
+        if (payload.date) payload.date = new Date(payload.date);
+        if (payload.taxableAmount !== undefined) payload.taxableAmount = parseFloat(payload.taxableAmount || 0);
+        if (payload.taxAmount !== undefined) payload.taxAmount = parseFloat(payload.taxAmount || 0);
+        
+        if (payload.clientId) payload.customerId = payload.clientId;
+
+        if (payload.customerId === '') payload.customerId = null;
+        if (payload.vendorId === '') payload.vendorId = null;
+        if (payload.projectId === '') payload.projectId = null;
+
+        delete payload.clientId;
+        delete payload.clientName;
+        delete payload.vendorName;
+        delete payload.projectName;
+        
+        return ExpenseModel.updateExpense(id, payload);
     }
 };
 

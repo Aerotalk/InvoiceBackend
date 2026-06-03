@@ -50,9 +50,21 @@ const deleteExpense = asyncHandler(async (req, res, next) => {
     });
 });
 
+const updateExpense = asyncHandler(async (req, res, next) => {
+    logger.info(`✏️ Updating expense ID: ${req.params.id}`);
+    const updatedExpense = await expenseService.updateExpense(req.params.id, req.user.id, req.body);
+    
+    res.status(200).json({
+        success: true,
+        data: updatedExpense,
+        message: 'Expense updated successfully'
+    });
+});
+
 module.exports = {
     createExpense,
     createExpensesBulk,
     getExpenses,
-    deleteExpense
+    deleteExpense,
+    updateExpense
 };

@@ -375,6 +375,19 @@ model UserSettings {
   standardTaxGst        Float?    @default(0)
   standardBaseCurrency  String?   @default("INR")
   
+  businessType          String?
+  industry              String?
+  fiscalYear            String?
+  orgLocation           String?
+  orgLanguage           String?
+  commLanguage          String?
+  timeZone              String?
+  dateFormat            String?
+  dateSeparator         String?
+  companyIdType         String?
+  companyIdValue        String?
+  additionalFields      Json?
+  
   profileAvatarUrl      String?
   brandLogoUrls         String[]
   billingAddresses      String[]

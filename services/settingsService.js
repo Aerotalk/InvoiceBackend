@@ -10,6 +10,9 @@ const getSettings = async (userId) => {
             adminProfileName: '',
             standardTaxGst: 10,
             standardBaseCurrency: 'INR',
+            businessType: '',
+            industry: '',
+            fiscalYear: '',
             profileAvatarUrl: '',
             brandLogoUrls: [],
             billingAddresses: []
