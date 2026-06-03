@@ -162,6 +162,13 @@ try {
 }
 
 try {
+    app.use('/api/purchase-orders', require('./routes/purchaseOrderRoutes'));
+    logger.debug('🛒 Purchase Order routes registered');
+} catch (error) {
+    logger.error('❌ Failed to load Purchase Order Routes:', error);
+}
+
+try {
     app.use('/api/settings', require('./routes/settingsRoutes'));
     logger.debug('⚙️ Settings routes registered');
 } catch (error) {

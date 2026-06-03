@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Purchase Order</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: Arial, sans-serif;
+      font-size: 12px;
+      color: #333;
+      padding: 30px;
+      background: #fff;
+    }
+    .header-table { width: 100%; border-bottom: 2px solid #ddd; padding-bottom: 10px; margin-bottom: 20px; }
+    .header-table td { vertical-align: top; }
+    .logo { max-width: 150px; max-height: 80px; }
+    .company-details { text-align: right; font-size: 11px; color: #555; }
+    .company-details h2 { font-size: 16px; color: #000; margin-bottom: 5px; }
+    .doc-title { text-align: center; font-size: 20px; font-weight: bold; margin: 20px 0; text-transform: uppercase; letter-spacing: 2px; }
+    
+    .info-section { width: 100%; margin-bottom: 20px; display: table; }
+    .info-box { display: table-cell; width: 50%; vertical-align: top; padding: 10px; border: 1px solid #ddd; border-radius: 4px; }
+    .info-box.right { text-align: right; }
+    .info-box h3 { font-size: 12px; color: #777; margin-bottom: 8px; text-transform: uppercase; }
+    .info-box h2 { font-size: 14px; color: #000; margin-bottom: 5px; }
+    
+    table.items-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+    table.items-table th, table.items-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+    table.items-table th { background: #f9fafb; font-weight: bold; color: #555; text-transform: uppercase; font-size: 10px; }
+    table.items-table td.right, table.items-table th.right { text-align: right; }
+    
+    .totals-box { width: 40%; float: right; border: 1px solid #ddd; border-radius: 4px; padding: 10px; }
+    .totals-table { width: 100%; }
+    .totals-table td { padding: 4px 0; }
+    .totals-table td.right { text-align: right; }
+    .totals-table tr.total td { font-weight: bold; font-size: 14px; border-top: 1px solid #ddd; padding-top: 8px; margin-top: 8px; }
+    
+    .clearfix::after { content: ""; clear: both; display: table; }
+    
+    .footer { margin-top: 30px; font-size: 11px; color: #666; border-top: 1px solid #ddd; padding-top: 10px; }
+    .terms { margin-bottom: 20px; white-space: pre-wrap; }
+    .amount-in-words { margin-top: 20px; font-weight: bold; }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <table class="header-table">
+    <tr>
+      <td>
+        {{#if logoUrl}}
+        <img src="{{logoUrl}}" class="logo" alt="Company Logo" />
+        {{/if}}
+      </td>
+      <td class="company-details">
+        <h2>{{companyName}}</h2>
+        <p>{{companyAddress}}</p>
+        {{#if companyPhone}}<p>Phone: {{companyPhone}}</p>{{/if}}
+        {{#if companyEmail}}<p>Email: {{companyEmail}}</p>{{/if}}
+        {{#if companyGstin}}<p>GSTIN: {{companyGstin}}</p>{{/if}}
+      </td>
+    </tr>
+  </table>
+
+  <div class="doc-title">Purchase Order</div>
+
+  <div class="info-section">
+    <div class="info-box">
+      <h3>Order To</h3>
+      <h2>{{vendorCompanySnapshot}}</h2>
+      {{#if vendorNameSnapshot}}<p>Attn: {{vendorNameSnapshot}}</p>{{/if}}
+      {{#if vendor.billingStreet1}}<p>{{vendor.billingStreet1}}</p>{{/if}}
+      {{#if vendor.billingStreet2}}<p>{{vendor.billingStreet2}}</p>{{/if}}
+      <p>{{vendor.billingCity}} {{vendor.billingState}} {{vendor.billingZipCode}}</p>
+      {{#if vendor.workPhone}}<p>Phone: {{vendor.workPhone}}</p>{{/if}}
+      {{#if vendor.email}}<p>Email: {{vendor.email}}</p>{{/if}}
+      {{#if vendor.gstNumber}}<p>GSTIN: {{vendor.gstNumber}}</p>{{/if}}
+    </div>
+    
+    <div style="width: 2%;"></div>
+    
+    <div class="info-box right">
+      <h3>Order Details</h3>
+      <table style="width: 100%; border: none;">
+        <tr><td style="border:none; padding:2px;">PO Number:</td><td style="border:none; padding:2px; font-weight:bold;">{{purchaseOrderId}}</td></tr>
+        <tr><td style="border:none; padding:2px;">Date:</td><td style="border:none; padding:2px;">{{date}}</td></tr>
+        {{#if dueDate}}<tr><td style="border:none; padding:2px;">Due Date:</td><td style="border:none; padding:2px;">{{dueDate}}</td></tr>{{/if}}
+        {{#if placeOfSupply}}<tr><td style="border:none; padding:2px;">Place of Supply:</td><td style="border:none; padding:2px;">{{placeOfSupply}}</td></tr>{{/if}}
+        {{#if transportMode}}<tr><td style="border:none; padding:2px;">Transport Mode:</td><td style="border:none; padding:2px;">{{transportMode}}</td></tr>{{/if}}
+        {{#if deliveryLocation}}<tr><td style="border:none; padding:2px;">Delivery Location:</td><td style="border:none; padding:2px;">{{deliveryLocation}}</td></tr>{{/if}}
+        {{#if euPoWoNumber}}<tr><td style="border:none; padding:2px;">EU PO/WO Number:</td><td style="border:none; padding:2px;">{{euPoWoNumber}}</td></tr>{{/if}}
+      </table>
+    </div>
+  </div>
+
+  <table class="items-table">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Item & Description</th>
+        <th>HSN/SAC</th>
+        <th class="right">Qty</th>
+        <th class="right">Rate</th>
+        <th class="right">Taxable</th>
+        <th class="right">GST %</th>
+        <th class="right">Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each items}}
+      <tr>
+        <td>{{index}}</td>
+        <td><strong>{{name}}</strong></td>
+        <td>{{hsnSac}}</td>
+        <td class="right">{{quantity}} {{unit}}</td>
+        <td class="right">{{rate}}</td>
+        <td class="right">{{taxableAmount}}</td>
+        <td class="right">{{gstRate}}%</td>
+        <td class="right">{{total}}</td>
+      </tr>
+      {{/each}}
+    </tbody>
+  </table>
+
+  <div class="clearfix">
+    <div class="totals-box">
+      <table class="totals-table">
+        <tr>
+          <td>Sub Total</td>
+          <td class="right">{{subTotal}}</td>
+        </tr>
+        <tr>
+          <td>Total GST</td>
+          <td class="right">{{totalTax}}</td>
+        </tr>
+        <tr class="total">
+          <td>Total Amount</td>
+          <td class="right">{{totalAmount}}</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="amount-in-words">
+    Total in Words: {{totalAmountInWords}}
+  </div>
+
+  {{#if termsAndConditions}}
+  <div class="footer">
+    <strong>Terms & Conditions</strong>
+    <div class="terms">{{termsAndConditions}}</div>
+  </div>
+  {{/if}}
+
+</body>
+</html>

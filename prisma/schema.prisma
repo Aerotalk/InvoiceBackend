@@ -30,6 +30,7 @@ model User {
   products    Product[]
   projects    Project[]
   quotations  Quotation[]
+  purchaseOrders PurchaseOrder[]
   deliveryChallans DeliveryChallan[]
   settings    UserSettings?
   expenses    Expense[]
@@ -210,6 +211,7 @@ model Vendor {
   contactPersons          VendorContactPerson[]
   customFields            VendorCustomField[]
   projectVendors          ProjectVendor[]
+  purchaseOrders          PurchaseOrder[]
   expenses                Expense[]
 
   createdAt               DateTime      @default(now())
@@ -260,6 +262,7 @@ model Product {
   userId              String
   user                User          @relation(fields: [userId], references: [id])
   quotationItems      QuotationItem[]
+  purchaseOrderItems  PurchaseOrderItem[]
   deliveryChallanItems DeliveryChallanItem[]
 
   createdAt           DateTime      @default(now())
@@ -280,6 +283,7 @@ model Project {
   
   vendors     ProjectVendor[]
   quotations  Quotation[]
+  purchaseOrders PurchaseOrder[]
   expenses    Expense[]
   
   currency    String    @default("INR")
@@ -502,4 +506,64 @@ model UploadedFile {
   user         User?    @relation(fields: [userId], references: [id])
   
   createdAt    DateTime @default(now())
+}
+
+model PurchaseOrder {
+  id              String    @id @default(uuid())
+  purchaseOrderId String    @unique
+  date            DateTime
+  dueDate         DateTime?
+  status          String    @default("draft")
+  
+  vendorNameSnapshot    String?
+  vendorCompanySnapshot String?
+  projectNameSnapshot   String?
+  
+  termsAndConditions String?   @db.Text
+  attachments     String[]
+
+  subtotal        Float
+  advance         Float?
+  balance         Float?
+  taxAmount       Float?
+  totalAmount     Float
+  signatureUrl    String?
+
+  placeOfSupply   String?
+  transportMode   String?
+  deliveryLocation String?
+  euPoWoNumber    String?
+
+  vendorId        String
+  vendor          Vendor    @relation(fields: [vendorId], references: [id])
+  
+  projectId       String?
+  project         Project?  @relation(fields: [projectId], references: [id])
+
+  userId          String
+  user            User      @relation(fields: [userId], references: [id])
+
+  items           PurchaseOrderItem[]
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+model PurchaseOrderItem {
+  id                String    @id @default(uuid())
+  purchaseOrderId   String
+  purchaseOrder     PurchaseOrder @relation(fields: [purchaseOrderId], references: [id], onDelete: Cascade)
+  
+  productId         String?
+  product           Product?  @relation(fields: [productId], references: [id])
+  name              String?
+  
+  hsnSac            String?
+  quantity          Float
+  unit              String?
+  price             Float
+  taxableAmount     Float
+  gstRate           Float?
+  gstAmount         Float     @default(0)
+  total             Float
 }
