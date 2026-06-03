@@ -39,13 +39,13 @@ const createPurchaseOrder = async (userId, data) => {
                 productId: item.productId === 'custom' || !item.productId ? null : item.productId,
                 name: item.name,
                 hsnSac: item.hsnSac || null,
-                quantity: item.quantity,
+                quantity: Number(item.quantity) || 0,
                 unit: item.unit || 'Nos',
-                price: item.price,
-                taxableAmount: item.taxableAmount,
-                gstRate: item.gstRate || 0,
-                gstAmount: item.gstAmount || 0,
-                total: item.total
+                price: Number(item.price) || 0,
+                taxableAmount: Number(item.taxableAmount) || 0,
+                gstRate: Number(item.gstRate) || 0,
+                gstAmount: Number(item.gstAmount) || 0,
+                total: Number(item.total) || 0
             }))
         }
     };
@@ -132,13 +132,13 @@ const updatePurchaseOrder = async (userId, id, data) => {
                         productId: item.productId === 'custom' || !item.productId ? null : item.productId,
                         name: item.name,
                         hsnSac: item.hsnSac || null,
-                        quantity: item.quantity,
+                        quantity: Number(item.quantity) || 0,
                         unit: item.unit || 'Nos',
-                        price: item.price,
-                        taxableAmount: item.taxableAmount,
-                        gstRate: item.gstRate || 0,
-                        gstAmount: item.gstAmount || 0,
-                        total: item.total
+                        price: Number(item.price) || 0,
+                        taxableAmount: Number(item.taxableAmount) || 0,
+                        gstRate: Number(item.gstRate) || 0,
+                        gstAmount: Number(item.gstAmount) || 0,
+                        total: Number(item.total) || 0
                     }))
                 }
             },
