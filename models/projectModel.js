@@ -19,7 +19,9 @@ const ProjectModel = {
                 customer: true,
                 vendors: {
                     include: { vendor: true }
-                }
+                },
+                quotations: true,
+                purchaseOrders: true
             }
         });
     },
