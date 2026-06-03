@@ -58,8 +58,10 @@ const generatePdf = asyncHandler(async (req, res, next) => {
     
     const po = await purchaseOrderService.getPurchaseOrderById(userId, req.params.id);
     
+    const safeFilename = po.purchaseOrderId ? po.purchaseOrderId.replace(/\//g, '_') : 'Purchase_Order';
+    
     res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `inline; filename=${po.purchaseOrderId}.pdf`);
+    res.setHeader('Content-Disposition', `inline; filename="${safeFilename}.pdf"`);
     res.setHeader('Content-Length', pdfBuffer.length);
     
     res.status(200).send(pdfBuffer);
