@@ -176,12 +176,16 @@ const generatePdf = async (id) => {
         // Challan fields
         challanNumber: challan.challanNumber,
         referenceNumber: challan.referenceNumber,
+        euPoWoNumber: challan.euPoWoNumber,
         challanDate: challan.challanDate.toLocaleDateString('en-GB'),
         transportMode: challan.transportMode,
         deliveryLocation: challan.deliveryLocation,
         customer: challan.customer,
         clientCompanySnapshot: challan.clientCompanySnapshot || (challan.customer && (challan.customer.companyName || challan.customer.displayName)) || '',
         clientNameSnapshot: challan.clientNameSnapshot || (challan.customer && challan.customer.displayName) || '',
+        contactName: (settings && settings.adminProfileName) || (user && user.fullName) || 'Rina Mali',
+        contactEmail: (settings && settings.billingEmailContact) || (user && user.email) || 'accounts@grivetyglobal.com',
+        contactPhone: (user && user.phoneNumber) ? `${user.phoneCode || ''}${user.phoneNumber}` : '9147310390',
         items: challan.items.map((item, index) => {
             totalQuantity += item.quantity;
             totalTax += item.taxAmount;
