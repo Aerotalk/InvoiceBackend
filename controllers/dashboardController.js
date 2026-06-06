@@ -7,12 +7,12 @@ const getDashboardStats = asyncHandler(async (req, res, next) => {
     logger.info(`📊 Fetching Dashboard Stats for user ${req.user.id}...`);
     const userId = req.user.id;
 
-    const [quotations, expenses, customers] = await Promise.all([
+    const [quotations, expenses, projects] = await Promise.all([
         prisma.quotation.findMany({ where: { userId } }),
         prisma.expense.findMany({ where: { userId } }),
-        prisma.customer.findMany({ 
+        prisma.project.findMany({ 
             where: { userId },
-            include: { quotations: true, expenses: true }
+            include: { quotations: true, expenses: true, customer: true }
         })
     ]);
 
@@ -61,27 +61,45 @@ const getDashboardStats = asyncHandler(async (req, res, next) => {
         const status = q.status || 'draft';
         statusMap[status] = (statusMap[status] || 0) + 1;
     });
+    
+    const colors = {
+        'paid': '#10b981',
+        'accepted': '#10b981',
+        'draft': '#94a3b8',
+        'sent': '#3b82f6',
+        'overdue': '#ef4444',
+        'expired': '#ef4444'
+    };
+
     const statusPieData = Object.keys(statusMap).map(status => ({
         name: status,
-        value: statusMap[status]
+        value: statusMap[status],
+        color: colors[status.toLowerCase()] || '#f59e0b'
     }));
 
     // Client Profitability Matrix
-    const clientProfitabilityData = customers.map(c => {
-        const billed = c.quotations.reduce((sum, q) => sum + (q.totalAmount || 0), 0);
-        const exp = c.expenses.reduce((sum, e) => sum + (e.amount || 0), 0);
-        const profit = billed - exp;
-        const margin = billed > 0 ? Math.round((profit / billed) * 100) : 0;
+    const customerMap = new Map();
+    projects.forEach(p => {
+        if (!p.customer) return;
+        const cid = p.customerId;
+        if (!customerMap.has(cid)) {
+            customerMap.set(cid, {
+                client: p.customer.displayName,
+                company: p.customer.companyName || 'N/A',
+                billed: 0,
+                expenses: 0
+            });
+        }
+        const stat = customerMap.get(cid);
+        stat.billed += p.quotations.reduce((sum, q) => sum + (q.totalAmount || 0), 0);
+        stat.expenses += p.expenses.reduce((sum, e) => sum + (e.amount || 0), 0);
+    });
 
-        return {
-            client: c.displayName,
-            company: c.companyName || 'N/A',
-            billed,
-            expenses: exp,
-            profit,
-            margin
-        };
-    }).sort((a, b) => b.profit - a.profit).slice(0, 5); // top 5
+    const clientProfitabilityData = Array.from(customerMap.values()).map(c => {
+        const profit = c.billed - c.expenses;
+        const margin = c.billed > 0 ? Math.round((profit / c.billed) * 100) : 0;
+        return { ...c, profit, margin };
+    }).sort((a, b) => b.profit - a.profit).slice(0, 5);
 
     const recentInvoices = quotations.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 5);
     const recentPayments = expenses.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 5);
