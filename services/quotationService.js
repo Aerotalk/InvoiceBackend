@@ -75,7 +75,9 @@ const getQuotationById = async (userId, id) => {
     const quote = await prisma.quotation.findFirst({
         where: { id, userId },
         include: {
-            items: true,
+            items: {
+                include: { product: true }
+            },
             customer: true,
             project: true
         }
@@ -232,16 +234,16 @@ const generatePdf = async (userId, id) => {
         customer: quotation.customer,
         clientCompanySnapshot: quotation.clientCompanySnapshot || (quotation.customer && (quotation.customer.companyName || quotation.customer.displayName)) || '',
         clientNameSnapshot: quotation.clientNameSnapshot || (quotation.customer && quotation.customer.displayName) || '',
-        salesperson: quotation.salesperson || '',
-        salespersonEmail: '',
-        salespersonMobile: '',
+        salespersonName: quotation.salesperson || (settings && settings.adminProfileName) || (user && user.fullName) || 'Dipa Dey',
+        salespersonEmail: (settings && settings.billingEmailContact) || (user && user.email) || 'dipa@grivetyglobal.com',
+        salespersonMobile: (user && user.phoneNumber) ? `${user.phoneCode || ''}${user.phoneNumber}` : '+91 7605084372',
         items: quotation.items.map((item, index) => ({
             index: index + 1,
             name: item.productNameSnapshot || 'Custom Item',
             description: item.customDetails || '',
-            hsn: '',
+            hsn: item.product ? item.product.hsnCode : '',
+            unit: (item.product && item.product.unit) || 'Nos',
             quantity: item.quantity,
-            unit: 'Nos',
             rate: item.rate.toFixed(2),
             taxableAmount: (item.quantity * item.rate).toFixed(2),
             tax: item.tax || (quotation.taxRate || 18),
