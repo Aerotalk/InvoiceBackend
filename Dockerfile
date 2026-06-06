@@ -13,7 +13,8 @@ RUN apt-get update \
 
 # Tell Puppeteer to skip installing its own Chrome and use the system one instead
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
-    PUPPETEER_EXECUTABLE_PATH=/usr/bin/google-chrome-stable
+    PUPPETEER_EXECUTABLE_PATH=/usr/bin/google-chrome-stable \
+    NODE_ENV=production
 
 # Set working directory
 WORKDIR /app
