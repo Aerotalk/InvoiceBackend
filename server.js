@@ -191,6 +191,13 @@ try {
     logger.error('❌ Failed to load Export Routes:', error);
 }
 
+try {
+    app.use('/api/dashboard', require('./routes/dashboardRoutes'));
+    logger.debug('📈 Dashboard routes registered');
+} catch (error) {
+    logger.error('❌ Failed to load Dashboard Routes:', error);
+}
+
 // Error Handler
 app.use(errorHandler);
 

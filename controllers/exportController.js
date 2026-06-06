@@ -113,6 +113,70 @@ const exportDataToExcel = asyncHandler(async (req, res, next) => {
     res.end();
 });
 
+const projectService = require('../services/projectService');
+
+const exportProjectWiseExcel = asyncHandler(async (req, res, next) => {
+    logger.info(`📊 Generating Project-wise Excel Export for user ${req.user.id}...`);
+
+    const userId = req.user.id;
+    
+    // We need projects with quotations and expenses.
+    // Since projectService.getProjectsByUser might not include quotations and expenses,
+    // we will fetch projects using prisma directly here for the report.
+    const { PrismaClient } = require('@prisma/client');
+    const prisma = new PrismaClient();
+    
+    const projects = await prisma.project.findMany({
+        where: { userId },
+        include: {
+            customer: true,
+            quotations: true,
+            expenses: true
+        }
+    });
+
+    const workbook = new ExcelJS.Workbook();
+    workbook.creator = 'InvoiceIQ System';
+    workbook.created = new Date();
+
+    const projSheet = workbook.addWorksheet('Project Profitability');
+    projSheet.columns = [
+        { header: 'Project Name', key: 'projectName', width: 30 },
+        { header: 'Customer', key: 'customerName', width: 25 },
+        { header: 'Status', key: 'status', width: 15 },
+        { header: 'Due Date', key: 'dueDate', width: 15 },
+        { header: 'Total Billed (Revenue)', key: 'billed', width: 25 },
+        { header: 'Total Expenses', key: 'expenses', width: 20 },
+        { header: 'Net Profit Margin', key: 'margin', width: 20 },
+        { header: 'Profit %', key: 'profitPercent', width: 15 }
+    ];
+
+    projects.forEach(p => {
+        const billed = p.quotations.reduce((sum, q) => sum + (q.totalAmount || 0), 0);
+        const expenses = p.expenses.reduce((sum, e) => sum + (e.amount || 0), 0);
+        const margin = billed - expenses;
+        const profitPercent = billed > 0 ? ((margin / billed) * 100).toFixed(2) + '%' : '0%';
+
+        projSheet.addRow({
+            projectName: p.projectName,
+            customerName: p.customer?.displayName || 'N/A',
+            status: p.status,
+            dueDate: p.dueDate ? p.dueDate.toISOString().split('T')[0] : 'N/A',
+            billed: billed.toFixed(2),
+            expenses: expenses.toFixed(2),
+            margin: margin.toFixed(2),
+            profitPercent
+        });
+    });
+
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', 'attachment; filename=' + 'Project_Report_' + new Date().getTime() + '.xlsx');
+
+    await workbook.xlsx.write(res);
+    res.end();
+});
+
 module.exports = {
-    exportDataToExcel
+    exportDataToExcel,
+    exportProjectWiseExcel
 };
