@@ -261,6 +261,15 @@ const generatePdf = async (userId, id) => {
 
     const companyName = (settings && settings.workspaceBrandName) || (user && user.companyName) || 'GRIVETY GLOBAL PRIVATE LIMITED';
 
+    const contactName = (settings && settings.adminProfileName) || (user && user.fullName) || 'Rina Mali';
+    const contactEmail = (settings && settings.billingEmailContact) || (user && user.email) || 'purchase@grivetyglobal.com';
+    const contactPhone = (user && user.phoneNumber) || '9147310390';
+
+    const rawTotalVal = po.subtotal + (po.taxAmount || 0);
+    const roundOffVal = po.totalAmount - rawTotalVal;
+    const advanceVal = po.advance || 0;
+    const balanceVal = po.balance || po.totalAmount;
+
     const data = {
         logoUrl: `data:image/png;base64,${logoBase64}`,
         companyName,
@@ -287,7 +296,7 @@ const generatePdf = async (userId, id) => {
         euPoWoNumber: po.euPoWoNumber || '',
         items: po.items.map((item, index) => ({
             index: index + 1,
-            name: item.name || 'Custom Item',
+            name: item.name ? item.name.replace(/\r?\n/g, '<br/>') : 'Custom Item',
             hsnSac: item.hsnSac || '',
             quantity: item.quantity,
             unit: item.unit || 'Nos',
@@ -302,9 +311,14 @@ const generatePdf = async (userId, id) => {
         totalTax: Number(totalTax).toFixed(2),
         sgst: (Number(totalTax) / 2).toFixed(2),
         cgst: (Number(totalTax) / 2).toFixed(2),
+        rawTotal: rawTotalVal.toFixed(2),
+        roundOff: roundOffVal.toFixed(2),
+        advance: advanceVal.toFixed(2),
+        balance: balanceVal.toFixed(2),
         totalAmount: po.totalAmount.toFixed(2),
         totalAmountInWords: amountInWords,
-        termsAndConditions: po.termsAndConditions || ''
+        termsAndConditions: po.termsAndConditions || '',
+        signatureUrl: po.signatureUrl
     };
 
     const finalHtml = template(data);
