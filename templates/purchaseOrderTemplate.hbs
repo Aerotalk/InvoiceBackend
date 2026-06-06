@@ -1,11 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Purchase Order</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
       font-family: Arial, sans-serif;
       font-size: 10px;
@@ -13,7 +19,8 @@
       background: #fff;
       padding: 10px 15px;
       line-height: 1.3;
-      padding-top: 110px; /* leaves space for fixed header */
+      padding-top: 110px;
+      /* leaves space for fixed header */
     }
 
     /* ── HEADER ── */
@@ -31,15 +38,18 @@
       background: #fff;
       z-index: 1000;
     }
+
     .header-logo img {
       max-width: 140px;
       max-height: 80px;
       object-fit: contain;
     }
+
     .header-company {
       text-align: right;
       max-width: 65%;
     }
+
     .header-company h1 {
       font-size: 13.5px;
       font-weight: bold;
@@ -47,6 +57,7 @@
       margin-bottom: 3px;
       letter-spacing: 0.5px;
     }
+
     .header-company p {
       font-size: 9px;
       line-height: 1.3;
@@ -63,6 +74,7 @@
       margin-bottom: 12px;
       border-radius: 4px;
     }
+
     .doc-title-bar span {
       font-size: 12px;
       font-weight: bold;
@@ -78,9 +90,11 @@
       gap: 12px;
       break-inside: avoid;
     }
+
     .info-col {
       /* Width set inline */
     }
+
     .col-title {
       font-size: 10px;
       font-weight: bold;
@@ -90,17 +104,20 @@
       margin-bottom: 5px;
       text-transform: uppercase;
     }
+
     .col-company {
       font-weight: bold;
       font-size: 9.5px;
       margin-bottom: 3px;
       text-transform: uppercase;
     }
+
     .col-text {
       font-size: 9px;
       line-height: 1.35;
       color: #222;
     }
+
     .col-text strong {
       font-weight: bold;
       color: #000;
@@ -112,16 +129,19 @@
       border-collapse: collapse;
       font-size: 9px;
     }
+
     .details-table td {
       padding: 1.5px 0;
       vertical-align: top;
       line-height: 1.25;
     }
+
     .details-table td.lbl {
       text-align: left;
       color: #222;
       width: 45%;
     }
+
     .details-table td.val {
       text-align: right;
       font-weight: bold;
@@ -136,6 +156,7 @@
       margin-bottom: 12px;
       font-size: 9.5px;
     }
+
     .items-table th {
       background: #949494;
       color: #fff;
@@ -146,25 +167,41 @@
       font-size: 9px;
       text-align: center;
     }
-    .items-table th.left { text-align: left; }
+
+    .items-table th.left {
+      text-align: left;
+    }
+
     .items-table td {
       border-bottom: 1px solid #ddd;
       padding: 6px;
       vertical-align: top;
       line-height: 1.3;
     }
-    .items-table td.num { text-align: center; }
-    .items-table td.center { text-align: center; }
-    .items-table td.right { text-align: right; }
+
+    .items-table td.num {
+      text-align: center;
+    }
+
+    .items-table td.center {
+      text-align: center;
+    }
+
+    .items-table td.right {
+      text-align: right;
+    }
+
     .items-table tr.total-row td {
       font-weight: bold;
       border-top: 1.5px solid #000;
       border-bottom: 1.5px solid #000;
       background: #fff;
     }
+
     tr {
       break-inside: avoid;
     }
+
     thead {
       display: table-header-group;
     }
@@ -177,18 +214,22 @@
       margin-bottom: 12px;
       break-inside: avoid;
     }
+
     .left-summary {
       width: 55%;
     }
+
     .right-summary {
       width: 42%;
     }
+
     .summary-table {
       width: 100%;
       border-collapse: collapse;
       font-size: 9px;
       margin-bottom: 10px;
     }
+
     .summary-table th {
       background: #949494;
       color: #fff;
@@ -198,16 +239,25 @@
       text-align: right;
       border: 1px solid #949494;
     }
-    .summary-table th.left { text-align: left; }
+
+    .summary-table th.left {
+      text-align: left;
+    }
+
     .summary-table td {
       border: 1px solid #ccc;
       padding: 4px 6px;
       text-align: right;
     }
-    .summary-table td.left { text-align: left; }
+
+    .summary-table td.left {
+      text-align: left;
+    }
+
     .summary-table tr.total-row td {
       font-weight: bold;
     }
+
     .bar-header {
       background: #949494;
       color: #fff;
@@ -218,6 +268,7 @@
       text-transform: uppercase;
       border-radius: 2px;
     }
+
     .bar-content {
       font-size: 9px;
       line-height: 1.35;
@@ -234,15 +285,18 @@
       margin-top: 15px;
       break-inside: avoid;
     }
+
     .footer-company-col {
       width: 50%;
       text-align: right;
     }
+
     .for-company {
       font-size: 9.5px;
       font-weight: bold;
       margin-bottom: 4px;
     }
+
     .signature-wrap {
       height: 60px;
       display: flex;
@@ -250,6 +304,7 @@
       justify-content: flex-end;
       margin-bottom: 4px;
     }
+
     .signature-wrap img {
       max-height: 55px;
       max-width: 130px;
@@ -257,13 +312,14 @@
     }
   </style>
 </head>
+
 <body>
 
   <!-- HEADER -->
   <div class="header">
     <div class="header-logo">
       {{#if logoUrl}}
-        <img src="{{logoUrl}}" alt="Company Logo" />
+      <img src="{{logoUrl}}" alt="Company Logo" />
       {{/if}}
     </div>
     <div class="header-company">
@@ -287,32 +343,34 @@
       <div class="col-title">Order To</div>
       <div class="col-company">{{vendorCompanySnapshot}}</div>
       <div class="col-text">
-        {{#if vendor.billingStreet1}}{{vendor.billingStreet1}}<br/>{{/if}}
-        {{#if vendor.billingStreet2}}{{vendor.billingStreet2}}<br/>{{/if}}
-        {{vendor.billingCity}}{{#if vendor.billingState}}, {{vendor.billingState}}{{/if}}{{#if vendor.billingZipCode}} - {{vendor.billingZipCode}}{{/if}}
-        {{#if vendor.billingCountry}}<br/>{{vendor.billingCountry}}{{/if}}
-        <br/>Contact No. : {{vendor.workPhone}}{{#unless vendor.workPhone}}{{vendor.mobilePhone}}{{/unless}}
-        <br/>GSTIN : {{vendor.gstNumber}}
-        <br/>State: {{vendor.billingState}}
+        {{#if vendor.billingStreet1}}{{vendor.billingStreet1}}<br />{{/if}}
+        {{#if vendor.billingStreet2}}{{vendor.billingStreet2}}<br />{{/if}}
+        {{vendor.billingCity}}{{#if vendor.billingState}}, {{vendor.billingState}}{{/if}}{{#if vendor.billingZipCode}} -
+        {{vendor.billingZipCode}}{{/if}}
+        {{#if vendor.billingCountry}}<br />{{vendor.billingCountry}}{{/if}}
+        <br />Contact No. : {{vendor.workPhone}}{{#unless vendor.workPhone}}{{vendor.mobilePhone}}{{/unless}}
+        <br />GSTIN : {{vendor.gstNumber}}
+        <br />State: {{vendor.billingState}}
       </div>
     </div>
-    
+
     <!-- Col 2: Transportation Details -->
     <div class="info-col" style="width: 27%;">
       <div class="col-title">Transportation Details</div>
       <div class="col-text">
         <strong>Transport Mode:</strong> {{transportMode}}
-        <br/><strong style="display:inline-block; margin-top: 4px;">Delivery Location:</strong> {{deliveryLocation}}
-        <br/><strong style="display:inline-block; margin-top: 4px;">EU PO/WO Number:</strong> {{euPoWoNumber}}
+        <br /><strong style="display:inline-block; margin-top: 4px;">Delivery Location:</strong> {{deliveryLocation}}
+        {{!-- <br /><strong style="display:inline-block; margin-top: 4px;">EU PO/WO Number:</strong> {{euPoWoNumber}}
+        --}}
       </div>
     </div>
-    
+
     <!-- Col 3: Order Details -->
     <div class="info-col" style="width: 35%;">
       <div class="col-title" style="text-align: right;">Order Details</div>
       <table class="details-table">
         <tr>
-          <td class="lbl">Order No. :</td>
+          <td class="lbl">PO/WO Number:</td>
           <td class="val">{{purchaseOrderId}}</td>
         </tr>
         <tr>
@@ -370,7 +428,7 @@
         <td class="center">{{unit}}</td>
         <td class="right">₹ {{rate}}</td>
         <td class="right">₹ {{taxableAmount}}</td>
-        <td class="right">₹ {{gstAmount}}<br/><span style="font-size: 8px; color: #555;">({{gstRate}}%)</span></td>
+        <td class="right">₹ {{gstAmount}}<br /><span style="font-size: 8px; color: #555;">({{gstRate}}%)</span></td>
         <td class="right">₹ {{total}}</td>
       </tr>
       {{/each}}
@@ -467,7 +525,7 @@
       <p class="for-company">For : {{companyName}}</p>
       <div class="signature-wrap">
         {{#if signatureUrl}}
-          <img src="{{signatureUrl}}" alt="Signature Stamp" />
+        <img src="{{signatureUrl}}" alt="Signature Stamp" />
         {{/if}}
       </div>
       <p style="font-weight: bold; font-size: 9.5px; margin-top: 4px;">Authorized Signatory</p>
@@ -475,4 +533,5 @@
   </div>
 
 </body>
+
 </html>
