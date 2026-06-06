@@ -101,8 +101,30 @@ const getDashboardStats = asyncHandler(async (req, res, next) => {
         return { ...c, profit, margin };
     }).sort((a, b) => b.profit - a.profit).slice(0, 5);
 
-    const recentInvoices = quotations.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 5);
-    const recentPayments = expenses.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 5);
+    const recentInvoices = quotations
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+        .slice(0, 5)
+        .map(q => ({
+            id: q.id,
+            invoiceNumber: q.quoteNumber,
+            clientCompany: q.clientCompanySnapshot || q.clientNameSnapshot || 'Unknown Client',
+            total: q.totalAmount,
+            currency: 'INR',
+            status: q.status,
+            issueDate: q.quoteDate
+        }));
+
+    const recentPayments = expenses
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+        .slice(0, 5)
+        .map(e => ({
+            id: e.id,
+            clientName: e.description || e.category || 'Expense',
+            method: e.category || 'Bank_Transfer',
+            amount: e.amount,
+            currency: e.currency || 'INR',
+            date: e.date
+        }));
 
     res.status(200).json({
         success: true,
