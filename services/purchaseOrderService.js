@@ -50,12 +50,33 @@ const createPurchaseOrder = async (userId, data) => {
         }
     };
 
-    return await prisma.purchaseOrder.create({
+    const createdPo = await prisma.purchaseOrder.create({
         data: payload,
         include: {
             items: true
         }
     });
+
+    // Automatically create a corresponding Expense
+    await prisma.expense.create({
+        data: {
+            userId,
+            date: createdPo.date,
+            category: 'Purchase Order',
+            amount: createdPo.totalAmount,
+            description: createdPo.purchaseOrderId,
+            notes: `PO_ID:${createdPo.id}`,
+            vendorId: createdPo.vendorId,
+            projectId: createdPo.projectId,
+            currency: 'INR',
+            taxableAmount: createdPo.subtotal,
+            taxAmount: createdPo.taxAmount || 0,
+            invoiceNumber: createdPo.purchaseOrderId,
+            receiptUrl: `api-call:po:${createdPo.id}`
+        }
+    });
+
+    return createdPo;
 };
 
 const getPurchaseOrders = async (userId) => {
@@ -147,6 +168,29 @@ const updatePurchaseOrder = async (userId, id, data) => {
             }
         });
     });
+
+    // Update associated expense
+    const existingExpense = await prisma.expense.findFirst({
+        where: { notes: `PO_ID:${id}`, userId }
+    });
+
+    if (existingExpense) {
+        await prisma.expense.update({
+            where: { id: existingExpense.id },
+            data: {
+                date: new Date(date),
+                amount: totalAmount,
+                description: purchaseOrderId,
+                vendorId: vendorId,
+                projectId: projectId || null,
+                taxableAmount: subtotal,
+                taxAmount: taxAmount || 0,
+                invoiceNumber: purchaseOrderId
+            }
+        });
+    }
+
+    return updatedPo;
 };
 
 const deletePurchaseOrder = async (userId, id) => {
@@ -161,6 +205,17 @@ const deletePurchaseOrder = async (userId, id) => {
     await prisma.purchaseOrder.delete({
         where: { id }
     });
+
+    // Also delete associated expense
+    const existingExpense = await prisma.expense.findFirst({
+        where: { notes: `PO_ID:${id}`, userId }
+    });
+
+    if (existingExpense) {
+        await prisma.expense.delete({
+            where: { id: existingExpense.id }
+        });
+    }
 
     return { message: "Purchase Order deleted successfully" };
 };
