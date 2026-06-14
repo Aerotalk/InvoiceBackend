@@ -186,7 +186,12 @@ const generatePdf = async (userId, id) => {
     
     // Prepare data
     const totalQuantity = quotation.items.reduce((sum, item) => sum + item.quantity, 0);
-    const totalTax = quotation.taxAmount || 0;
+    const computedTotalTax = quotation.items.reduce((sum, item) => {
+        const itemTaxRate = item.tax ? Number(item.tax) : (quotation.taxRate || 18);
+        const itemTaxAmount = item.taxAmount ? Number(item.taxAmount) : ((item.quantity * item.rate) * itemTaxRate / 100);
+        return sum + itemTaxAmount;
+    }, 0);
+    const totalTax = quotation.taxAmount || computedTotalTax;
     
     const toWords = require('number-to-words');
     const amountInWords = (toWords.toWords(Math.floor(quotation.totalAmount)) + ' rupees only').replace(/(^\w|\s\w)/g, m => m.toUpperCase());
