@@ -135,6 +135,7 @@
       text-align: center;
     }
     .items-table th.left { text-align: left; }
+    .items-table th.right { text-align: right; }
     .items-table td {
       border: 1px solid #ccc;
       padding: 5px 6px;
@@ -328,10 +329,10 @@
         <th style="width: 70px;">HSN/ SAC</th>
         <th style="width: 50px;">Quantity</th>
         <th style="width: 40px;">Unit</th>
-        <th style="width: 80px;">Price/ Unit</th>
-        <th style="width: 85px;">Taxable amount</th>
-        <th style="width: 85px;">GST</th>
-        <th style="width: 85px;">Amount</th>
+        <th style="width: 80px;" class="right">Price/ Unit</th>
+        <th style="width: 85px;" class="right">Taxable amount</th>
+        <th style="width: 85px;" class="right">GST</th>
+        <th style="width: 85px;" class="right">Amount</th>
       </tr>
     </thead>
     <tbody>
@@ -349,7 +350,7 @@
         <td class="center">{{unit}}</td>
         <td class="right">₹ {{rate}}</td>
         <td class="right">₹ {{taxableAmount}}</td>
-        <td class="center">₹ {{taxAmount}}<br/>({{tax}}%)</td>
+        <td class="right">₹ {{taxAmount}}<br/>({{tax}}%)</td>
         <td class="right">₹ {{amount}}</td>
       </tr>
       {{/each}}
